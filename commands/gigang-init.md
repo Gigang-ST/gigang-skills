@@ -85,7 +85,7 @@ $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
 [OK]   작업 폴더     C:\Prog (변경 없음)
 [OK]   Terminal      기본=pwsh7, startingDir=C:\Prog
 [OK]   cc alias      $PROFILE 에 추가
-[OK]   CLAUDE.md     uv 문구 추가
+[OK]   CLAUDE.md     uv 문구 + gigang-skills 이슈 안내 추가
 [OK]   superpowers   플러그인 설치
 [OK]   디폴트 모델   claude-sonnet-4-6 설정
 

@@ -166,6 +166,32 @@ function Add-CcAlias {
     Write-Step OK 'cc alias' "$profilePath 에 추가"
 }
 
+function Add-ClaudeMdGigang {
+    $claudeMd = Join-Path $env:USERPROFILE '.claude\CLAUDE.md'
+    $marker   = 'Gigang-ST/gigang-skills'
+
+    if (Test-Path $claudeMd) {
+        $content = Get-Content $claudeMd -Raw
+        if ($content -match [regex]::Escape($marker)) {
+            Write-Step SKIP 'CLAUDE.md gigang' '이미 있음'
+            return
+        }
+    } else {
+        $dir = Split-Path $claudeMd -Parent
+        if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    }
+
+    $section = @"
+
+## gigang-skills
+
+Claude 사용 중 버그, 불편함, 추가됐으면 하는 기능이 생기면 GitHub 이슈로 올려주세요:
+https://github.com/Gigang-ST/gigang-skills/issues/new
+"@
+    [System.IO.File]::AppendAllText($claudeMd, $section, [System.Text.UTF8Encoding]::new($false))
+    Write-Step OK 'CLAUDE.md gigang' "$claudeMd 에 추가"
+}
+
 function Add-ClaudeMdUv {
     $claudeMd = Join-Path $env:USERPROFILE '.claude\CLAUDE.md'
     $marker   = '파이썬이 필요한 경우 uv를 이용하세요'
@@ -205,6 +231,7 @@ New-WorkDir         -Path    $WorkDir
 Set-TerminalDefault -WorkDir $WorkDir
 Add-CcAlias
 Add-ClaudeMdUv
+Add-ClaudeMdGigang
 
 Write-Host ""
 Write-Host "=== 완료 ==================================================="
