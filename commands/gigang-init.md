@@ -96,6 +96,54 @@ $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
 
 `[FAIL]` 항목이 있으면 강조 + 사용자에게 수동 복구 안내.
 
+## Phase 4 — 실패 항목 이슈 자동 등록
+
+Phase 3 요약에서 `[FAIL]` 항목이 하나라도 있으면 자동으로 GitHub 이슈를 생성한다.
+
+먼저 gh 인증 여부 확인:
+
+```powershell
+gh auth status 2>&1
+```
+
+인증 안 된 경우 → 이슈 생성 skip, 아래 안내만 출력:
+> gh 인증이 필요합니다. `gh auth login` 실행 후 `/gigang-init` 을 다시 호출하면 자동으로 이슈가 등록됩니다.
+> 지금 바로 올리려면: https://github.com/Gigang-ST/gigang-skills/issues/new
+
+인증된 경우 → Windows 버전과 실패 항목 목록을 포함한 이슈 생성:
+
+```powershell
+$winVer = (Get-CimInstance Win32_OperatingSystem).Caption
+$psVer  = $PSVersionTable.PSVersion.ToString()
+
+$failLines = # Phase 3에서 캡처한 [FAIL] 줄들
+
+$body = @"
+## 환경
+- OS: $winVer
+- PowerShell: $psVer
+
+## 실패 항목
+$failLines
+
+## 재현 방법
+/gigang-init 실행
+"@
+
+gh issue create `
+    --repo Gigang-ST/gigang-skills `
+    --title "[gigang-init] $($failLines.Count)개 항목 실패" `
+    --body $body `
+    --label "bug"
+```
+
+이슈 생성 성공 시:
+> 이슈가 등록됐습니다: <이슈 URL>
+> 확인 후 수동으로 처리하거나 멤버에게 공유하세요.
+
+이슈 생성 실패 시 (네트워크 오류 등) → URL 안내로 fallback:
+> 이슈 자동 등록 실패. 직접 올려주세요: https://github.com/Gigang-ST/gigang-skills/issues/new
+
 ## 흔한 실수
 
 - winget 자체 미설치 (Windows 10 구버전) → https://aka.ms/getwinget 안내
