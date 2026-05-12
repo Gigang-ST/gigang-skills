@@ -83,7 +83,8 @@ Grep으로 이전 경로 패턴을 스캔한다:
 
 ```
 대상 파일: .md, .py, .ps1, .json, .txt
-패턴: 이동한 파일명이 포함된 줄
+패턴: 파일 이동 전의 전체 경로(예: data/raw/report.csv)를 그대로 검색
+  → 파일명만 검색하면 관련 없는 줄까지 걸림
 ```
 
 영향받는 파일 목록을 출력하고 AskUserQuestion으로 확인:
@@ -116,9 +117,12 @@ CLAUDE.md가 있으면 줄 수를 확인:
 ```
 
 A 선택 시:
-1. 폴더 관련 내용 → `docs/folder-conventions.md` 로 추출
+1. 폴더 구조·네이밍 규칙 → `docs/folder-conventions.md` 로 추출
+   (예: "outputs/ 에 최종 결과물 저장", "raw/ 는 절대 수정 금지" 등)
 2. AI 작업 지시사항 → `docs/ai-context.md` 로 추출
-3. CLAUDE.md에 `@docs/folder-conventions.md`, `@docs/ai-context.md` 삽입
+   (예: 언어 설정, 응답 스타일, 프롬프트 지침 등)
+3. 나머지(hook, 커밋 규칙, 도구 허용 목록 등)는 CLAUDE.md에 그대로 유지
+4. CLAUDE.md 상단에 `@docs/folder-conventions.md`, `@docs/ai-context.md` 참조 삽입
 
 ### 10. 완료 요약
 
