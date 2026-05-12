@@ -185,7 +185,8 @@ function Add-ClaudeMdGigang {
 
 ## gigang-skills
 
-Claude 사용 중 버그, 불편함, 추가됐으면 하는 기능이 생기면 GitHub 이슈로 올려주세요:
+gigang-skills 는 AI를 처음 써보는 사람들이 함께 만들어가는 도구 모음입니다.
+쓰다가 이런 커맨드나 스킬이 있으면 좋겠다 싶은 게 있으면 이슈로 올려주세요. 같이 추가합니다.
 https://github.com/Gigang-ST/gigang-skills/issues/new
 "@
     [System.IO.File]::AppendAllText($claudeMd, $section, [System.Text.UTF8Encoding]::new($false))
