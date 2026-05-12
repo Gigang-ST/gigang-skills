@@ -85,6 +85,20 @@ claude --dangerously-skip-permissions
 
 `/gigang-init` 은 멱등 — 재실행해도 안전.
 
+## 문제 신고 / 개선 제안
+
+버그, 설치 실패, 불편한 점, 추가됐으면 하는 기능 — 뭐든 이슈로 올려주세요.
+
+**→ https://github.com/Gigang-ST/gigang-skills/issues/new**
+
+이슈 작성 시 아래 내용만 적어주면 됩니다:
+
+- **무슨 일이 있었나** (예: `/gigang-init` 실행했더니 `[FAIL] uv` 떴다)
+- **어떻게 됐으면 좋겠나** (예: uv가 자동으로 설치됐으면 좋겠다)
+- **PC 환경** — Windows 버전, 어떤 방법으로 설치했는지 (방법 A/B)
+
+형식 없이 한국어로 자유롭게 써도 됩니다.
+
 ## 라이선스
 
 MIT
