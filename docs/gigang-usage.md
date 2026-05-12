@@ -8,17 +8,14 @@
 
 ## /gigang-init
 
-**용도**: 신규 기강 개발팀 멤버의 개발 환경을 한 번에 셋업.
+**용도**: 기강 멤버의 Claude Code 환경을 한 번에 셋업.
 
 **설치 항목**:
-- `git`, `gh` (GitHub CLI), PowerShell 7, Node.js LTS, Bun, pnpm, uv
+- `git`, `gh` (GitHub CLI), PowerShell 7, uv (Python 실행기)
 - Windows Terminal 기본 프로파일 → PowerShell 7, 시작 디렉토리 설정
 - `cc` alias (`claude --dangerously-skip-permissions`)
 - `~/.claude/CLAUDE.md` uv 문구
-- Claude Code 플러그인: superpowers, playwright
-- gstack
-
-**MCP**: gigang-client 폴더를 열면 `.mcp.json` 을 통해 자동 활성.
+- Claude Code 플러그인: superpowers
 
 **실행**:
 ```
@@ -36,7 +33,7 @@ claude --dangerously-skip-permissions
 
 비활성화: `~/.claude/settings.json` 에서 `UserPromptSubmit` / `Stop` 항목 제거.
 
-> **평문 저장 주의**: API 키·비밀번호 등을 prompt에 직접 입력하지 마세요. 로컬에만 저장되며 외부 전송은 없지만, 백업·동기화 대상에 포함되지 않도록 주의.
+> **평문 저장 주의**: API 키·비밀번호 등을 prompt에 직접 입력하지 마세요.
 
 ## 자동 업데이트
 

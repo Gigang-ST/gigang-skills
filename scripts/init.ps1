@@ -1,5 +1,5 @@
 # Gigang 신규 멤버용 환경 셋업 스크립트
-# - winget 패키지(git, gh, pwsh7, node, bun, pnpm), uv, 작업 폴더
+# - winget 패키지(git, gh, pwsh7), uv, 작업 폴더
 # - Windows Terminal 기본 프로파일/시작 폴더
 # - PowerShell $PROFILE 의 cc alias
 # - ~/.claude/CLAUDE.md 의 uv 문구
@@ -64,22 +64,6 @@ function Install-WingetPackage {
     } else {
         Write-Step FAIL $DisplayName "winget 종료 코드 $LASTEXITCODE"
         $wingetOut | Select-Object -Last 5 | ForEach-Object { Write-Host "    $_" }
-    }
-}
-
-function Install-Pnpm {
-    if (Get-Command pnpm -ErrorAction SilentlyContinue) {
-        $ver = (pnpm --version 2>$null)
-        Write-Step SKIP 'pnpm' "이미 설치됨 ($ver)"
-        return
-    }
-    try {
-        Invoke-RestMethod https://get.pnpm.io/install.ps1 | Invoke-Expression
-        $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' +
-                    [System.Environment]::GetEnvironmentVariable('Path', 'User')
-        Write-Step OK 'pnpm' 'installer 실행 완료'
-    } catch {
-        Write-Step FAIL 'pnpm' $_.Exception.Message
     }
 }
 
@@ -216,9 +200,6 @@ Write-Host ""
 Install-WingetPackage -Id 'Git.Git'              -DisplayName 'git'          -VersionCommand 'git --version'
 Install-WingetPackage -Id 'GitHub.cli'           -DisplayName 'gh'           -VersionCommand 'gh --version'
 Install-WingetPackage -Id 'Microsoft.PowerShell' -DisplayName 'PowerShell 7' -VersionCommand 'pwsh -Version'
-Install-WingetPackage -Id 'OpenJS.NodeJS.LTS'    -DisplayName 'Node.js'      -VersionCommand 'node --version'
-Install-WingetPackage -Id 'Oven-sh.Bun'          -DisplayName 'Bun'          -VersionCommand 'bun --version'
-Install-Pnpm
 Install-Uv
 New-WorkDir         -Path    $WorkDir
 Set-TerminalDefault -WorkDir $WorkDir
