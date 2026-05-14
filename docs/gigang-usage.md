@@ -110,3 +110,32 @@ Issue 제출처: https://github.com/Gigang-ST/gigang-skills/issues
 ## /folder-guide (구버전)
 
 `/gigang-folder-guide` 로 대체됨. 기존 사용자 호환용으로 유지.
+
+---
+
+## 교육 자료 (education/)
+
+기강 멤버 대상 Agentic AI 교육 커리큘럼. 4brain-skills 교육 자료를 기강 브랜드로 적용.
+
+| 파일 | 내용 |
+|------|------|
+| `education/draft_md/00-index.md` | 커리큘럼 인덱스 및 시간표 |
+| `education/draft_md/01-why.md` | 왜 Agentic AI인가 |
+| `education/draft_md/02-concepts.md` | 핵심 용어 (토큰·컨텍스트·MCP 등) |
+| `education/draft_md/03-setup.md` | Claude Code + gigang-skills 설치 가이드 |
+| `education/draft_md/04-usage.md` | 기본 사용법 & 단축키 |
+| `education/draft_md/05-security.md` | 주의사항 & 보안 |
+| `education/draft_md/06-gigang.md` | 기강 스킬 활용 (자동 로그·팀 도구) |
+| `education/draft_md/appendix/` | A~G: Git, uv, 프롬프트, CLAUDE.md, MCP, 자동화, 폴더구조 |
+| `education/draft_md/appendix/H-gigang-뭐했더라.md` | 과거 세션 조회 — 커리큘럼 이후 추가 기능 |
+
+### PPT 제작 도구
+
+| 파일 | 용도 |
+|------|------|
+| `education/ppt/design.md` | 기강 PPT 디자인 시스템 (색상·폰트·레이아웃) |
+| `education/ppt/GIGANG_PPT_Design_System_Prompt.md` | Claude에게 붙여넣는 슬라이드 제작 프롬프트 |
+
+**PPT 제작 시**: `GIGANG_PPT_Design_System_Prompt.md` 전체를 Claude에 붙여넣은 뒤 슬라이드 내용을 요청.
+
+**로고 위치**: `C:\Prog\PRIVATE\gigang-client\public\logo.webp` (흑백), `logo_white.webp` (흰색)
