@@ -5,7 +5,19 @@
 | 명령 | 용도 |
 |------|------|
 | `/gigang-init` | 신규 멤버 환경 초기 셋업 |
-| `/folder-guide` | 대화형 폴더 구조 생성 및 정리 |
+| `/gigang-help` | 이 사용법 문서 표시 |
+| `/gigang-version` | 설치된 버전 및 업데이트 상태 확인 |
+| `/folder-guide` | 대화형 폴더 구조 생성 및 정리 (구버전) |
+| `/gigang-folder-guide` | 대화형 폴더 구조 생성 및 정리 |
+| `/gigang-report` | 버그·개선 아이디어를 GitHub Issue로 제출 |
+
+**자연어 스킬** (슬래시 없이 말로 발동):
+
+| 발동 표현 | 스킬 |
+|-----------|------|
+| "어제 뭐했더라", "지난주 작업 정리해줘" | `gigang-뭐했더라` |
+| "폴더 구조 잡아줘", "폴더 정리해줘" | `gigang-folder-guide` |
+| "버그 보고해줘", "이슈 올려줘" | `gigang-report` |
 
 ## /gigang-init
 
@@ -14,6 +26,7 @@
 **설치 항목**:
 - `git`, `gh` (GitHub CLI), PowerShell 7, uv (Python 실행기)
 - Windows Terminal 기본 프로파일 → PowerShell 7, 시작 디렉토리 설정
+- D2Coding 폰트 설치 + Windows Terminal 글씨체 적용
 - `cc` alias (`claude --dangerously-skip-permissions`)
 - `~/.claude/CLAUDE.md` uv 문구
 - Claude Code 플러그인: superpowers
@@ -42,16 +55,15 @@ SessionStart hook이 매 Claude Code 세션 시작 시 백그라운드로 `git f
 
 비활성화: `~/.claude/settings.json` 의 `hooks.SessionStart` 에서 `update.ps1` 항목 제거.
 
-## /folder-guide
+## /gigang-folder-guide
 
-**용도**: 비개발자를 위한 대화형 폴더 구조 가이드.
-프로젝트 유형을 질문한 뒤 맞춤 폴더 구조를 제안하고, 확인 후 실제로 생성한다.
+**용도**: 대화형 폴더 구조 가이드. 프로젝트 유형을 질문한 뒤 맞춤 폴더 구조를 제안하고, 확인 후 실제로 생성한다.
 
 **지원 프로젝트 유형**:
 - 업무문서 — 보고서, 엑셀, PPT 등 일반 업무 파일
-- AI 활용 — Claude/GPT 프롬프트와 결과물 관리
+- AI 활용 — Claude 프롬프트와 결과물 관리
 - 데이터 분석 — 데이터 처리, 분석, 차트 생성
-- 복합 — 위 여러 유형 조합
+- 소프트웨어 개발 — Python/스크립트 개발, 빌드·배포 포함
 
 **주요 기능**:
 - 트리 구조 미리보기 → 확인 후 폴더 생성
@@ -63,4 +75,38 @@ SessionStart hook이 매 Claude Code 세션 시작 시 백그라운드로 `git f
 - "폴더 구조 잡아줘"
 - "폴더 정리 도와줘"
 - "프로젝트 디렉토리 만들어줘"
-- `/folder-guide`
+- `/gigang-folder-guide`
+
+## /gigang-뭐했더라 (자연어 스킬)
+
+**용도**: 과거 Claude 세션 작업 내역 조회. 날짜별 로그를 읽어 bullet 요약으로 표시.
+
+**발동 표현**:
+- "어제 뭐했더라", "지난주에 뭐했지"
+- "5/13에 뭐했더라", "이번주 정리해줘"
+- "전체 어제 뭐했더라" → 모든 프로젝트 조회
+
+로그 위치: `~/.claude/logs/prompts/<project>/<날짜>.md`  
+요약 캐시: `~/.claude/logs/prompts/<project>/<YYMMDD>_summary.md`
+
+## /gigang-report (자연어 스킬)
+
+**용도**: 스킬·커맨드의 버그, 개선 아이디어, 기능 요청을 GitHub Issue로 제출.
+
+**발동 표현**: "버그 보고해줘", "이슈 올려줘", "에러 났어", "개선 제안 올리고 싶어"
+
+**gh CLI 미설치 시**: 설치·로그인 가이드 안내 후 직접 링크 제공.
+
+Issue 제출처: https://github.com/Gigang-ST/gigang-skills/issues
+
+## /gigang-version
+
+**용도**: 설치된 Gigang Skills 버전, repo 위치, 최신 여부 표시.
+
+## /gigang-help
+
+**용도**: 이 사용법 문서(`docs/gigang-usage.md`)를 그대로 출력.
+
+## /folder-guide (구버전)
+
+`/gigang-folder-guide` 로 대체됨. 기존 사용자 호환용으로 유지.

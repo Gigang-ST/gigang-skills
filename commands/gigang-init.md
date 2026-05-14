@@ -73,6 +73,67 @@ $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
 
 이미 `claude-sonnet-4-6` 이면 덮어써도 안전 (멱등).
 
+## Phase 2-c — Windows Terminal 글씨체 D2Coding 설정
+
+D2Coding 폰트 설치 + Windows Terminal 적용. 멱등.
+
+```powershell
+# 1. 폰트 설치 (이미 있으면 skip)
+$fontCheck = "D2Coding-Ver1.3.2-20180524.ttf"
+$alreadyInstalled = (Test-Path "C:\Windows\Fonts\$fontCheck") -or
+    (Test-Path "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\$fontCheck")
+
+if ($alreadyInstalled) {
+    Write-Host '[SKIP] D2Coding 폰트   이미 설치됨'
+} else {
+    try {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $zip  = "$env:TEMP\D2Coding.zip"
+        $xdir = "$env:TEMP\D2Coding_extracted"
+        Invoke-WebRequest -Uri "https://github.com/naver/d2codingfont/releases/download/VER1.3.2/D2Coding-Ver1.3.2-20180524.zip" `
+                          -OutFile $zip -UseBasicParsing
+        New-Item -ItemType Directory -Path $xdir -Force | Out-Null
+        $zf = [System.IO.Compression.ZipFile]::OpenRead($zip)
+        foreach ($entry in $zf.Entries) {
+            if ($entry.Name -like "*.ttf") {
+                $dest = Join-Path $xdir $entry.Name
+                $s = $entry.Open(); $fs = [System.IO.File]::Create($dest)
+                $s.CopyTo($fs); $fs.Close(); $s.Close()
+            }
+        }
+        $zf.Dispose()
+        $shell = New-Object -ComObject Shell.Application
+        $fontsFolder = $shell.Namespace(0x14)
+        Get-ChildItem $xdir -Filter "*.ttf" | ForEach-Object {
+            $fontsFolder.CopyHere($_.FullName, 0x14)
+        }
+        Remove-Item $zip, $xdir -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host '[OK]   D2Coding 폰트   설치 완료'
+    } catch {
+        Write-Host "[FAIL] D2Coding 폰트   $_ — 무시하고 계속"
+    }
+}
+
+# 2. Windows Terminal settings.json 에 font.face 적용
+$wtSettings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+if (Test-Path $wtSettings) {
+    $raw = Get-Content $wtSettings -Raw | ConvertFrom-Json
+    if (-not $raw.profiles.defaults) {
+        $raw.profiles | Add-Member -NotePropertyName defaults -NotePropertyValue ([PSCustomObject]@{}) -Force
+    }
+    if (-not $raw.profiles.defaults.font) {
+        $raw.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue ([PSCustomObject]@{}) -Force
+    }
+    $raw.profiles.defaults.font | Add-Member -NotePropertyName face -NotePropertyValue "D2Coding" -Force
+    $raw | ConvertTo-Json -Depth 20 | Set-Content $wtSettings -Encoding UTF8
+    Write-Host '[OK]   Terminal 글씨체  D2Coding 적용'
+} else {
+    Write-Host '[SKIP] Terminal 글씨체  settings.json 없음 — Windows Terminal 미설치 or 경로 다름'
+}
+```
+
+실패해도 다음 Phase 계속. Terminal 재시작해야 적용됨.
+
 ## Phase 3 — 최종 요약
 
 각 Phase 의 결과를 표로:
@@ -88,6 +149,7 @@ $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
 [OK]   CLAUDE.md     uv 문구 + gigang-skills 이슈 안내 추가
 [OK]   superpowers   플러그인 설치
 [OK]   디폴트 모델   claude-sonnet-4-6 설정
+[OK]   D2Coding 폰트  설치 + Terminal 적용
 
 다음:
   1. 새 PowerShell 창 열기 (PATH 갱신)
