@@ -30,6 +30,7 @@
 - `cc` alias (`claude --dangerously-skip-permissions`)
 - `~/.claude/CLAUDE.md` uv 문구
 - Claude Code 플러그인: superpowers
+- gstack (웹 브라우저 자동화 스킬 모음) — `~/.claude/skills/gstack` 클론 + CLAUDE.md gstack 섹션
 
 **실행**:
 ```

@@ -73,7 +73,46 @@ $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
 
 이미 `claude-sonnet-4-6` 이면 덮어써도 안전 (멱등).
 
-## Phase 2-c — Windows Terminal 글씨체 D2Coding 설정
+## Phase 2-c — gstack 설치
+
+gstack은 Claude Code에 웹 브라우저 자동화(`/browse`)와 개발 워크플로 스킬을 추가하는 오픈소스 도구 모음입니다.
+
+```powershell
+$gstackPath = "$env:USERPROFILE\.claude\skills\gstack"
+if (Test-Path $gstackPath) {
+    Write-Host '[SKIP] gstack   이미 설치됨'
+} else {
+    try {
+        git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git $gstackPath
+        Write-Host '[OK]   gstack   클론 완료'
+    } catch {
+        Write-Host "[FAIL] gstack   $_ — 무시하고 계속"
+    }
+}
+```
+
+설치 후 `~/.claude/CLAUDE.md` 에 gstack 섹션 추가 (이미 있으면 skip):
+
+```powershell
+$claudeMd = "$env:USERPROFILE\.claude\CLAUDE.md"
+$content = if (Test-Path $claudeMd) { Get-Content $claudeMd -Raw } else { "" }
+if ($content -notmatch "gstack") {
+    $gstackSection = @"
+
+## gstack
+
+모든 웹 브라우징은 gstack 의 `/browse` 스킬 사용. `mcp__claude-in-chrome__*` 도구는 사용하지 않는다.
+"@
+    Add-Content $claudeMd $gstackSection -Encoding UTF8
+    Write-Host '[OK]   CLAUDE.md  gstack 섹션 추가'
+} else {
+    Write-Host '[SKIP] CLAUDE.md  gstack 이미 있음'
+}
+```
+
+실패해도 다음 Phase 계속.
+
+## Phase 2-d — Windows Terminal 글씨체 D2Coding 설정
 
 D2Coding 폰트 설치 + Windows Terminal 적용. 멱등.
 
@@ -149,6 +188,7 @@ if (Test-Path $wtSettings) {
 [OK]   CLAUDE.md     uv 문구 + gigang-skills 이슈 안내 추가
 [OK]   superpowers   플러그인 설치
 [OK]   디폴트 모델   claude-sonnet-4-6 설정
+[OK]   gstack        ~/.claude/skills/gstack 클론 + CLAUDE.md 섹션 추가
 [OK]   D2Coding 폰트  설치 + Terminal 적용
 
 다음:
