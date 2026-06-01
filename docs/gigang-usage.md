@@ -7,7 +7,6 @@
 | `/gigang-init` | 신규 멤버 환경 초기 셋업 |
 | `/gigang-help` | 이 사용법 문서 표시 |
 | `/gigang-version` | 설치된 버전 및 업데이트 상태 확인 |
-| `/folder-guide` | 대화형 폴더 구조 생성 및 정리 (구버전) |
 | `/gigang-folder-guide` | 대화형 폴더 구조 생성 및 정리 |
 | `/gigang-report` | 버그·개선 아이디어를 GitHub Issue로 제출 |
 
@@ -15,6 +14,7 @@
 
 | 발동 표현 | 스킬 |
 |-----------|------|
+| "기강 환경 셋업해줘", "기강 도움말" | `gigang` (자연어 라우터) |
 | "어제 뭐했더라", "지난주 작업 정리해줘" | `gigang-뭐했더라` |
 | "폴더 구조 잡아줘", "폴더 정리해줘" | `gigang-folder-guide` |
 | "버그 보고해줘", "이슈 올려줘" | `gigang-report` |
@@ -108,9 +108,13 @@ Issue 제출처: https://github.com/Gigang-ST/gigang-skills/issues
 
 **용도**: 이 사용법 문서(`docs/gigang-usage.md`)를 그대로 출력.
 
-## /folder-guide (구버전)
+## gigang (자연어 라우터 스킬)
 
-`/gigang-folder-guide` 로 대체됨. 기존 사용자 호환용으로 유지.
+**용도**: 슬래시 명령을 외울 필요 없이 평소 말투로 기강 작업 시작.
+
+**발동 표현**:
+- "신규 멤버 환경 셋업해줘", "기강 깔아줘" → `/gigang-init`
+- "기강 뭐 있어", "기강 도움말" → 명령 목록 출력
 
 ---
 

@@ -72,6 +72,24 @@ Sync-Children (Join-Path $repoRoot 'commands') (Join-Path $claudeDir 'commands')
 Sync-Children (Join-Path $repoRoot 'skills')   (Join-Path $claudeDir 'skills')   'skill'
 Sync-Children (Join-Path $repoRoot 'hooks')    (Join-Path $claudeDir 'hooks')    'hook'
 
+# 2-b. stale 파일 정리 — repo에서 삭제된 gigang-* 항목을 로컬에서도 제거
+function Remove-Stale {
+    param([string]$srcDir, [string]$dstDir, [string]$pattern)
+    if (-not (Test-Path $dstDir)) { return }
+    $srcNames = if (Test-Path $srcDir) {
+        @(Get-ChildItem $srcDir | Select-Object -ExpandProperty Name)
+    } else { @() }
+    Get-ChildItem $dstDir -Filter $pattern -ErrorAction SilentlyContinue | Where-Object {
+        $_.Name -notin $srcNames
+    } | ForEach-Object {
+        Remove-Item -Recurse -Force $_.FullName
+        Write-Host ("[DEL] stale  {0}" -f $_.Name)
+    }
+}
+
+Remove-Stale (Join-Path $repoRoot 'commands') (Join-Path $claudeDir 'commands') 'gigang-*.md'
+Remove-Stale (Join-Path $repoRoot 'skills')   (Join-Path $claudeDir 'skills')   'gigang*'
+
 # 3. settings.json hook 등록 (idempotent)
 $settingsPath = Join-Path $claudeDir 'settings.json'
 if (-not (Test-Path $settingsPath)) {
@@ -172,6 +190,28 @@ if ($hasLogScripts) {
     Write-Warning "hooks/log_prompt.py 또는 log_response.py 없음 — 로그 hook 미등록"
 }
 
+# 3e. UserPromptSubmit — Opus 권장 작업 감지
+$opusSuggestPath = Join-Path $claudeDir 'hooks\opus_suggest.py'
+if (Test-Path $opusSuggestPath) {
+    $opusEntry = [PSCustomObject]@{
+        hooks = @(
+            [PSCustomObject]@{
+                type    = 'command'
+                command = 'uv run --no-project python "$HOME/.claude/hooks/opus_suggest.py"'
+                timeout = 3
+            }
+        )
+    }
+    Register-Hook -Event 'UserPromptSubmit' `
+                  -Marker 'opus_suggest\.py' `
+                  -HookEntry $opusEntry `
+                  -Label 'UserPromptSubmit Opus 권장 감지'
+} else {
+    Write-Warning "hooks/opus_suggest.py 없음 — Opus 권장 hook 미등록"
+}
+
 Write-Host ""
 Write-Host "설치 완료. 다음 Claude Code 세션부터 자동 업데이트 + 프롬프트/응답 로그 활성."
 Write-Host "로그 위치: ~/.claude/logs/prompts/<project-name>/YYYY-MM-DD.md"
+Write-Host ""
+Write-Host "신규 멤버 PC 초기 셋업(winget, cc alias, Terminal 등)은 Claude Code 에서 /gigang-init 실행"
