@@ -1,0 +1,17 @@
+{
+  "name": "gigang-ppt",
+  "version": "1.0.0",
+  "description": "기강 교육자료 PPT 빌드",
+  "main": "build_ppt_gigang.js",
+  "scripts": {
+    "build": "node build_ppt_gigang.js",
+    "build:chapter": "node build_ppt_gigang.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}
