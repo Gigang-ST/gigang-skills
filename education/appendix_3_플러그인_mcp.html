@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>능력을 더하는 법 — 플러그인 &amp; MCP</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --indigo:#4369E9; --indigo-deep:#3254CC; --pale:#C7D2FE; --ice:#EEF2FF;
+    --coral:#F05A28; --amber:#D97706; --ink:#0F172A; --slate800:#1E293B;
+    --slate700:#334155; --slate500:#64748B; --border:#E2E8F0; --white:#fff;
+    --green:#059669;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Pretendard","Noto Sans KR",system-ui,sans-serif;color:var(--slate700);background:var(--ice);line-height:1.7;font-size:15px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px 80px}
+
+  header.hero{background:var(--ink);color:var(--white);padding:56px 20px 48px;border-bottom:6px solid var(--indigo)}
+  header.hero .inner{max-width:880px;margin:0 auto}
+  .kicker{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--pale);background:rgba(67,105,233,.18);padding:5px 12px;border-radius:99px;margin-bottom:18px}
+  header.hero h1{font-size:34px;font-weight:800;color:var(--white);line-height:1.25;letter-spacing:-.5px}
+  header.hero p.lead{margin-top:14px;font-size:16px;color:var(--pale);max-width:660px}
+
+  .intro{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px 26px;margin:-28px 0 36px;box-shadow:0 8px 30px rgba(15,23,42,.06)}
+  .intro h2{font-size:15px;color:var(--indigo);font-weight:800;margin-bottom:8px}
+  .intro p{color:var(--slate700)}
+  .intro .triad{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:600px){.intro .triad{grid-template-columns:1fr}}
+  .intro .triad div{background:var(--ice);border:1px solid var(--pale);border-radius:10px;padding:12px 14px}
+  .intro .triad b{display:block;color:var(--indigo-deep);font-size:13.5px;margin-bottom:2px}
+  .intro .triad span{font-size:12.5px;color:var(--slate500)}
+
+  .card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:30px 30px 26px;margin-bottom:26px;box-shadow:0 4px 18px rgba(15,23,42,.04);scroll-margin-top:20px}
+  .card.security{border:2px solid var(--coral);box-shadow:0 8px 28px rgba(240,90,40,.10)}
+  .card.cost{border:2px solid var(--amber);box-shadow:0 8px 28px rgba(217,119,6,.10)}
+  .card.cost .num{background:var(--amber)}
+  .card.cost ul li::before{background:var(--amber)}
+  .card.cost .takeaway .strip{background:var(--amber)}
+  .tag.cost{background:#FFFBEB;color:var(--amber);border-color:#FDE68A}
+  .card-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:6px}
+  .num{flex:none;width:46px;height:46px;border-radius:12px;background:var(--indigo);color:#fff;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center}
+  .card.security .num{background:var(--coral)}
+  .card-head .titles{flex:1}
+  .card-head h3{font-size:21px;color:var(--ink);font-weight:800;line-height:1.3}
+  .card-head h3 code{font-size:18px}
+  .oneline{margin-top:5px;font-size:13.5px;color:var(--slate500)}
+
+  .tag{display:inline-block;font-size:12px;font-weight:700;padding:4px 11px;border-radius:99px;margin:14px 0 4px;background:var(--ice);color:var(--indigo-deep);border:1px solid var(--pale)}
+  .tag.warn{background:#FFF1ED;color:var(--coral);border-color:#FECDCA}
+
+  .label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate500);margin:20px 0 8px}
+  .analogy{background:#FFFBEB;border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:12px 16px;font-size:14px;color:#92670c}
+  .analogy b{color:var(--amber)}
+  .card p{margin:10px 0}
+  .card ul{margin:8px 0 8px 4px;list-style:none}
+  .card ul li{position:relative;padding-left:22px;margin:7px 0}
+  .card ul li::before{content:"";position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--indigo)}
+  .card.security ul li::before{background:var(--coral)}
+  strong{color:var(--ink);font-weight:700}
+  code{background:var(--ice);color:var(--indigo-deep);padding:1.5px 6px;border-radius:5px;font-size:13px;font-family:"SFMono-Regular",Consolas,monospace}
+  a.repo{color:var(--indigo);text-decoration:none;font-family:"SFMono-Regular",Consolas,monospace;font-size:13px;word-break:break-all}
+  a.repo:hover{text-decoration:underline}
+
+  .example{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:8px 0}
+  .example .ex-name{font-weight:800;color:var(--ink);font-size:14.5px}
+  .example .ex-desc{font-size:13.5px;color:var(--slate700);margin:3px 0 6px}
+  .example .ex-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--ice);color:var(--indigo-deep);margin-left:6px}
+  .example .ex-badge.un{background:#FFF1ED;color:var(--coral)}
+
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:600px){.vs{grid-template-columns:1fr}}
+  .vs .col{border-radius:12px;padding:16px 18px;background:var(--ice);border:1px solid var(--pale)}
+  .vs .col h4{font-size:14px;font-weight:800;color:var(--indigo-deep);margin-bottom:8px}
+  .vs .col ul{margin:0} .vs .col ul li{font-size:13.5px;margin:5px 0}
+
+  .doblock{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:600px){.doblock{grid-template-columns:1fr}}
+  .dont,.do{border-radius:12px;padding:16px 18px}
+  .dont{background:#FFF5F2;border:1px solid #FECDCA}
+  .do{background:#ECFDF5;border:1px solid #A7F3D0}
+  .dont h4,.do h4{font-size:13px;font-weight:800;margin-bottom:8px}
+  .dont h4{color:var(--coral)} .do h4{color:var(--green)}
+  .dont ul li::before{background:var(--coral)} .do ul li::before{background:var(--green)}
+  .dont ul,.do ul{margin:0} .dont ul li,.do ul li{font-size:13.5px;margin:5px 0}
+
+  .takeaway{background:var(--ink);border-radius:10px;margin-top:20px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+  .takeaway .strip{flex:none;width:4px;align-self:stretch;background:var(--indigo);border-radius:3px}
+  .card.security .takeaway .strip{background:var(--coral)}
+  .takeaway .t-label{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--pale);text-transform:uppercase;margin-bottom:3px}
+  .takeaway p{margin:0;color:#fff;font-size:14px}
+
+  .summary{background:#fff;border:1px solid var(--border);border-radius:16px;padding:8px;margin-top:34px;overflow:hidden}
+  .summary h3{font-size:18px;color:var(--ink);font-weight:800;padding:18px 20px 12px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:12px 16px;border-top:1px solid var(--border);vertical-align:top}
+  th{background:var(--ice);color:var(--indigo-deep);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}
+
+  footer{text-align:center;margin-top:40px;font-size:12.5px;color:var(--slate500)}
+  footer b{color:var(--indigo-deep)}
+  .src{margin-top:18px;font-size:11.5px;color:var(--slate500);background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 18px;line-height:1.9}
+  .src b{color:var(--slate700)} .src a{color:var(--indigo);text-decoration:none;word-break:break-all}
+
+  @media print{body{background:#fff} .card,.intro,.summary{box-shadow:none;break-inside:avoid} header.hero{padding:30px 20px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">기강 · Claude Code 확장하기</span>
+    <h1>능력을 더하는 법 — 플러그인 &amp; MCP</h1>
+    <p class="lead">기본 Claude도 강하지만, <strong style="color:#fff">플러그인</strong>(확장팩)과
+      <strong style="color:#fff">MCP</strong>(외부 연결 규격)로 능력을 더 붙일 수 있습니다.
+      둘 다 <strong style="color:#fff">누구나 만들어 GitHub에 공유</strong>하니, 찾아서 가져다 쓰면 됩니다.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="intro">
+    <h2>한눈에</h2>
+    <p>“능력을 더한다”는 두 갈래입니다. 하나는 <strong>Claude Code 자체에 기능 묶음을 설치</strong>하는 것(플러그인),
+      다른 하나는 <strong>Claude를 외부 서비스에 연결</strong>하는 것(MCP)입니다.
+      마지막에 <strong>아무거나 가져다 쓸 때의 보안 주의</strong>까지 짚습니다.</p>
+    <div class="triad">
+      <div><b>① 플러그인</b><span>Claude Code에 끼우는 “확장팩” (스킬·명령 묶음)</span></div>
+      <div><b>② MCP</b><span>Claude를 외부 서비스에 잇는 “표준 어댑터”</span></div>
+      <div><b>③ GitHub에서 찾아쓰기</b><span>카카오톡 MCP 등 누구나 올린 것을 검색</span></div>
+      <div><b>④ 보안 주의</b><span>가져온 것은 내 권한으로 돈다 — 신뢰부터</span></div>
+      <div><b>⑤ 비용·메모리</b><span>많이 깔수록 토큰을 먹는다 — 자주 쓰는 것만</span></div>
+    </div>
+  </div>
+
+  <!-- 1 Plugins -->
+  <div class="card" id="plugin">
+    <div class="card-head">
+      <div class="num">1</div>
+      <div class="titles">
+        <h3>플러그인 — Claude Code에 끼우는 “확장팩”</h3>
+        <div class="oneline">스킬·명령·에이전트를 통째로 추가하는 묶음. 마켓플레이스에서 설치합니다</div>
+      </div>
+    </div>
+    <span class="tag">확장팩 (Plugin)</span>
+
+    <div class="label">한 줄 비유</div>
+    <div class="analogy">브라우저 <b>확장프로그램</b>이나 게임 <b>DLC</b>처럼, 기본 Claude Code에 <b>기능 한 묶음을 통째로</b> 더하는 것.</div>
+
+    <div class="label">무엇인가</div>
+    <ul>
+      <li>플러그인 하나엔 <strong>여러 스킬·슬래시 명령·에이전트·자동화(훅)</strong>가 들어 있습니다.</li>
+      <li>Claude Code의 <strong>마켓플레이스</strong>에서 골라 설치합니다. (이 교육에서 쓰는 일부 기능도 플러그인 출신입니다.)</li>
+    </ul>
+
+    <div class="label">대표 플러그인</div>
+    <div class="example">
+      <span class="ex-name">Superpowers</span><span class="ex-badge">가장 유명</span>
+      <div class="ex-desc">개발·작업 방법론을 가르치는 스킬 묶음 — 만들기 전 <strong>설계(brainstorming)</strong>, 체계적 디버깅, 단계별 계획 등. (부록 2의 brainstorming이 바로 여기 출신) 설치 수십만 건.</div>
+      <a class="repo" href="https://github.com/obra/superpowers">github.com/obra/superpowers</a>
+    </div>
+    <div class="example">
+      <span class="ex-name">Context7</span><span class="ex-badge">실무 인기</span>
+      <div class="ex-desc">라이브러리·도구의 <strong>최신 공식 문서를 그때그때 가져와</strong> Claude에게 먹입니다. AI 지식이 오래돼 생기는 “옛날 방식대로 알려주는” 문제를 줄여줍니다.</div>
+      <a class="repo" href="https://github.com/upstash/context7">github.com/upstash/context7</a>
+    </div>
+    <p style="margin-top:8px;font-size:13.5px;color:var(--slate500)">이 밖에 Anthropic 공식 플러그인(frontend-design, feature-dev, code-review 등)도 있습니다. 모아둔 목록:
+      <a class="repo" href="https://github.com/Chat2AnyLLM/awesome-claude-plugins">github.com/Chat2AnyLLM/awesome-claude-plugins</a></p>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>플러그인 = Claude Code 확장팩. 백지에서 다 만들지 말고, <b>이미 잘 만든 기능 묶음을 설치해</b> 쓴다.</p>
+    </div></div>
+  </div>
+
+  <!-- 2 MCP -->
+  <div class="card" id="mcp">
+    <div class="card-head">
+      <div class="num">2</div>
+      <div class="titles">
+        <h3>MCP — Claude를 외부 서비스에 잇는 “표준 어댑터”</h3>
+        <div class="oneline">Model Context Protocol. AI와 외부 도구·데이터를 연결하는 공개 표준입니다</div>
+      </div>
+    </div>
+    <span class="tag">외부 연결 (MCP)</span>
+
+    <div class="label">한 줄 비유</div>
+    <div class="analogy">AI에 꽂는 <b>USB 포트</b>. 규격(표준)이 정해져 있어서, 한 번 맞춰 만든 장치(서버)를 <b>여러 AI가 그대로 꽂아</b> 씁니다.</div>
+
+    <div class="label">무엇인가</div>
+    <ul>
+      <li><strong>MCP 서버</strong>는 특정 능력 하나를 제공하는 작은 프로그램입니다 — 예: 메일 읽기, 데이터베이스 조회, 캘린더 등록, <strong>카카오톡 메시지 보내기</strong>.</li>
+      <li>이 능력을 Claude에 <strong>연결</strong>하면, Claude가 그 서비스를 직접 다룰 수 있게 됩니다.</li>
+      <li>핵심은 <strong>“누구나 만들어 공개”</strong>한다는 점 — GitHub에 수많은 MCP 서버가 올라와 있고, <strong>검색해서 가져다 연결</strong>하면 됩니다.</li>
+    </ul>
+
+    <div class="label">예시 — 카카오톡 MCP는 실제로 있습니다 (모두 비공식·커뮤니티)</div>
+    <div class="example">
+      <span class="ex-name">kakao-bot-mcp-server</span><span class="ex-badge un">비공식</span>
+      <div class="ex-desc">카카오 개발자 API로 <strong>“나에게 메시지 보내기”</strong> 등을 AI 에이전트와 연결. (카카오 공식 아님)</div>
+      <a class="repo" href="https://github.com/inspirit941/kakao-bot-mcp-server">github.com/inspirit941/kakao-bot-mcp-server</a>
+    </div>
+    <div class="example">
+      <span class="ex-name">kakao-api-mcp-server</span><span class="ex-badge un">비공식</span>
+      <div class="ex-desc"><strong>카카오맵·다음 검색 API</strong>를 AI가 쓰도록 연결 — 지도·검색 기능.</div>
+      <a class="repo" href="https://github.com/jeong-sik/kakao-api-mcp-server">github.com/jeong-sik/kakao-api-mcp-server</a>
+    </div>
+    <div class="example">
+      <span class="ex-name">kakaocli</span><span class="ex-badge un">비공식 · UI 자동화</span>
+      <div class="ex-desc">공식 API로 안 되는 일까지 — <strong>DB 읽기 + 화면 자동조작</strong>으로 카톡 메시지를 읽고 보냄. <span style="color:var(--coral)">접근 방식상 보안 주의가 가장 큰 유형</span>(아래 4번 참고).</div>
+      <a class="repo" href="https://github.com/silver-flight-group/kakaocli">github.com/silver-flight-group/kakaocli</a>
+    </div>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>MCP = AI에 능력을 꽂는 표준 포트. 필요한 기능은 대개 <b>GitHub에 누군가 이미 만들어 뒀다</b> — 검색해서 연결.</p>
+    </div></div>
+  </div>
+
+  <!-- 3 Plugin vs MCP -->
+  <div class="card" id="diff">
+    <div class="card-head">
+      <div class="num">3</div>
+      <div class="titles">
+        <h3>플러그인 vs MCP — 헷갈리지 않게</h3>
+        <div class="oneline">겹쳐 보이지만 역할이 다릅니다 (플러그인이 MCP를 품기도 합니다)</div>
+      </div>
+    </div>
+    <div class="vs">
+      <div class="col">
+        <h4>플러그인 (확장팩)</h4>
+        <ul>
+          <li><strong>어디에:</strong> Claude Code <strong>안</strong>에 설치</li>
+          <li><strong>무엇을:</strong> 스킬·명령·에이전트·자동화 묶음</li>
+          <li><strong>목적:</strong> Claude의 <strong>일하는 방식</strong>을 늘림</li>
+          <li><strong>예:</strong> Superpowers, Context7</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>MCP (어댑터)</h4>
+        <ul>
+          <li><strong>어디에:</strong> <strong>외부</strong> 서비스에 연결</li>
+          <li><strong>무엇을:</strong> 메일·DB·카톡 등 <strong>바깥 능력</strong></li>
+          <li><strong>목적:</strong> Claude가 <strong>다룰 수 있는 대상</strong>을 늘림</li>
+          <li><strong>예:</strong> 카카오톡 MCP, 구글 캘린더 MCP</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:14px"><strong>관계:</strong> 둘은 배타적이지 않습니다. 플러그인이 <strong>내부에 MCP 서버를 품고</strong> 배포되기도 합니다(예: Context7). 한 줄로: <strong>플러그인은 “기능 묶음”, MCP는 “외부 연결 규격”.</strong></p>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>플러그인은 <b>Claude의 능력</b>을, MCP는 <b>Claude가 닿는 바깥세상</b>을 넓힌다.</p>
+    </div></div>
+  </div>
+
+  <!-- 4 Security -->
+  <div class="card security" id="security">
+    <div class="card-head">
+      <div class="num">★</div>
+      <div class="titles">
+        <h3>【주의】 GitHub에서 가져온 것은 “내 권한”으로 돈다</h3>
+        <div class="oneline">아무거나 연결하기 전에 — 신뢰·검증부터</div>
+      </div>
+    </div>
+    <span class="tag warn">보안 (Security)</span>
+
+    <div class="label">왜 조심해야 하나</div>
+    <ul>
+      <li>MCP 서버·플러그인은 <strong>내 컴퓨터에서 내 권한으로 실행</strong>됩니다 — 내 파일, 내 계정, 내 데이터에 접근할 수 있습니다.</li>
+      <li>대부분 <strong>비공식·개인 제작</strong>입니다(카카오톡 MCP들도 전부 비공식). 악의가 없어도 <strong>버그·과도한 권한·방치된 코드</strong>일 수 있습니다.</li>
+      <li>특히 <strong>로그인·UI 자동화·DB 직접 읽기</strong> 방식(예: <code>kakaocli</code>류)은 부록 1에서 말한 <strong>“자동 로그인 = 보안 솔루션에 탈취로 탐지”</strong> 문제와 직결됩니다. <strong>회사 PC에서는 보안 정책 위반</strong>이 될 수 있습니다.</li>
+    </ul>
+
+    <div class="label">가져다 쓸 때 체크리스트</div>
+    <div class="doblock">
+      <div class="dont"><h4>✕ 이러면 위험</h4><ul>
+        <li>출처·코드 안 보고 바로 연결</li>
+        <li>비번·토큰을 설정 파일에 그대로</li>
+        <li>회사 PC에 비공식 메신저 자동화 설치</li>
+      </ul></div>
+      <div class="do"><h4>✓ 이렇게</h4><ul>
+        <li>스타 수·최근 커밋·코드 한 번 확인</li>
+        <li>권한은 꼭 필요한 범위만 부여</li>
+        <li>민감 작업은 회사 보안 정책 먼저 확인</li>
+      </ul></div>
+    </div>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>“GitHub에 있으니 안전”은 틀린 생각. 연결하는 순간 <b>내 권한을 빌려주는 것</b> — 신뢰할 수 있는 것만, 권한은 최소로.</p>
+    </div></div>
+  </div>
+
+  <!-- 5 Token cost -->
+  <div class="card cost" id="tokens">
+    <div class="card-head">
+      <div class="num">₩</div>
+      <div class="titles">
+        <h3>【비용】 많이 깔수록 “토큰(메모리)”을 더 먹는다</h3>
+        <div class="oneline">설치만 해두고 안 써도, 켜져 있는 것만으로 토큰을 잡아먹습니다</div>
+      </div>
+    </div>
+    <span class="tag cost">비용·메모리 (Cost)</span>
+
+    <div class="label">왜 그런가</div>
+    <ul>
+      <li>설치한 플러그인·MCP 서버는 대화를 시작할 때마다 <strong>각자의 도구 설명·명령 목록을 컨텍스트(AI의 메모리)에 미리 올립니다.</strong></li>
+      <li>그래서 많이 깔아둘수록 <strong>일을 시작하기도 전에 토큰을 차지</strong>합니다 — 안 쓰고 켜두기만 해도요.</li>
+    </ul>
+
+    <div class="label">무엇이 나빠지나</div>
+    <ul>
+      <li><strong>① 비용 ↑</strong> — 매 요청마다 더 많은 토큰을 깔고 시작합니다.</li>
+      <li><strong>② 여유 공간 ↓</strong> — 실제 작업·대화에 쓸 메모리가 줄어듭니다.</li>
+      <li><strong>③ 정확도·속도 ↓</strong> — 선택지(도구)가 너무 많으면 AI가 헷갈리거나 느려질 수 있습니다.</li>
+    </ul>
+
+    <div class="label">권장</div>
+    <ul>
+      <li>“혹시 몰라서” 잔뜩 켜두지 말 것. <strong>자주 쓰는 것만 남기고</strong> 나머지는 끄거나 제거하세요.</li>
+      <li>필요할 때만 연결하는 습관 — 부록 2의 <strong>“빈도가 곧 비용”</strong> 원칙과 같은 맥락입니다.</li>
+    </ul>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>플러그인·MCP는 <b>켜져 있는 것만으로 토큰을 먹는다.</b> 많이 깔지 말고 <b>자주 쓰는 것만</b> 남겨라.</p>
+    </div></div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <h3>한 장 요약</h3>
+    <table>
+      <thead><tr><th>구분</th><th>한 줄 정의</th><th>예시</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>플러그인</td>
+          <td>Claude Code에 기능 묶음(스킬·명령)을 더하는 확장팩</td>
+          <td>Superpowers, Context7</td>
+        </tr>
+        <tr>
+          <td>MCP</td>
+          <td>Claude를 외부 서비스에 잇는 표준 어댑터(서버)</td>
+          <td>카카오톡·카카오맵·캘린더 MCP</td>
+        </tr>
+        <tr>
+          <td>찾는 곳</td>
+          <td>누구나 만들어 올림 — GitHub에서 검색해 가져다 연결</td>
+          <td>awesome-claude-plugins, GitHub 검색</td>
+        </tr>
+        <tr>
+          <td>보안</td>
+          <td>가져온 것은 내 권한으로 실행 — 신뢰·검증·최소권한</td>
+          <td>회사 PC는 정책 먼저 확인</td>
+        </tr>
+        <tr>
+          <td>토큰·메모리</td>
+          <td>설치한 것마다 컨텍스트에 도구 설명을 올림 — 많이 깔수록 토큰↑·속도↓</td>
+          <td>자주 쓰는 것만 남기고 나머지는 끄기</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="src">
+    <b>참고 출처</b><br>
+    · Superpowers(Jesse Vincent @obra): <a href="https://github.com/obra/superpowers">github.com/obra/superpowers</a> · Context7: <a href="https://github.com/upstash/context7">github.com/upstash/context7</a><br>
+    · 플러그인 모음: <a href="https://github.com/Chat2AnyLLM/awesome-claude-plugins">github.com/Chat2AnyLLM/awesome-claude-plugins</a> · MCP 공식 서버 모음: <a href="https://github.com/modelcontextprotocol/servers">github.com/modelcontextprotocol/servers</a><br>
+    · 카카오톡 MCP(비공식): <a href="https://github.com/inspirit941/kakao-bot-mcp-server">inspirit941/kakao-bot-mcp-server</a> · <a href="https://github.com/jeong-sik/kakao-api-mcp-server">jeong-sik/kakao-api-mcp-server</a> · <a href="https://github.com/silver-flight-group/kakaocli">silver-flight-group/kakaocli</a>
+  </div>
+
+  <footer><p><b>기강</b> · Claude Code 확장하기 · 플러그인 &amp; MCP</p></footer>
+
+</div>
+</body>
+</html>
