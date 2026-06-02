@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 처음 쓸 때 — 흔한 실수 & 주의사항</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --indigo:#4369E9; --indigo-deep:#3254CC; --pale:#C7D2FE; --ice:#EEF2FF;
+    --coral:#F05A28; --amber:#D97706; --ink:#0F172A; --slate800:#1E293B;
+    --slate700:#334155; --slate500:#64748B; --border:#E2E8F0; --white:#fff;
+    --green:#059669;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Pretendard","Noto Sans KR",system-ui,sans-serif;
+    color:var(--slate700); background:var(--ice); line-height:1.7;
+    font-size:15px; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px 80px}
+
+  /* Header */
+  header.hero{
+    background:var(--ink); color:var(--white);
+    padding:56px 20px 48px; margin-bottom:0;
+    border-bottom:6px solid var(--indigo);
+  }
+  header.hero .inner{max-width:880px;margin:0 auto}
+  .kicker{
+    display:inline-block; font-size:11px; font-weight:700; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--pale); background:rgba(67,105,233,.18);
+    padding:5px 12px; border-radius:99px; margin-bottom:18px;
+  }
+  header.hero h1{font-size:34px;font-weight:800;color:var(--white);line-height:1.25;letter-spacing:-.5px}
+  header.hero p.lead{margin-top:14px;font-size:16px;color:var(--pale);max-width:640px}
+
+  /* Intro callout */
+  .intro{
+    background:var(--white); border:1px solid var(--border); border-radius:14px;
+    padding:24px 26px; margin:-28px 0 36px; box-shadow:0 8px 30px rgba(15,23,42,.06);
+    position:relative;
+  }
+  .intro h2{font-size:15px;color:var(--indigo);font-weight:800;margin-bottom:8px}
+  .intro p{color:var(--slate700)}
+  .intro .who{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+  .intro .who span{
+    font-size:12.5px;background:var(--ice);color:var(--indigo-deep);
+    border:1px solid var(--pale);padding:4px 11px;border-radius:8px;font-weight:600;
+  }
+
+  /* Cards */
+  .card{
+    background:var(--white); border:1px solid var(--border); border-radius:16px;
+    padding:30px 30px 26px; margin-bottom:26px; box-shadow:0 4px 18px rgba(15,23,42,.04);
+    scroll-margin-top:20px;
+  }
+  .card.security{border:2px solid var(--coral);box-shadow:0 8px 28px rgba(240,90,40,.10)}
+  .card-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:6px}
+  .num{
+    flex:none;width:42px;height:42px;border-radius:11px;background:var(--indigo);
+    color:#fff;font-weight:800;font-size:19px;display:flex;align-items:center;justify-content:center;
+  }
+  .card.security .num{background:var(--coral)}
+  .card-head .titles{flex:1}
+  .card-head h3{font-size:20px;color:var(--ink);font-weight:800;line-height:1.3}
+  .by{margin-top:4px;font-size:12.5px;color:var(--slate500)}
+  .by b{color:var(--indigo-deep);font-weight:700}
+
+  /* Verdict pill */
+  .verdict{
+    display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;
+    padding:5px 12px;border-radius:99px;margin:14px 0 4px;
+  }
+  .v-true{background:#ECFDF5;color:var(--green);border:1px solid #A7F3D0}
+  .v-mostly{background:#FFFBEB;color:var(--amber);border:1px solid #FDE68A}
+  .v-critical{background:#FFF1ED;color:var(--coral);border:1px solid #FECdca}
+
+  .label{
+    font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+    color:var(--slate500);margin:20px 0 8px;
+  }
+  .memo{
+    background:#F8FAFC;border-left:3px solid var(--pale);border-radius:0 8px 8px 0;
+    padding:12px 16px;font-size:14px;color:var(--slate700);font-style:italic;
+  }
+  .card p{margin:10px 0}
+  .card ul{margin:8px 0 8px 4px;list-style:none}
+  .card ul li{position:relative;padding-left:22px;margin:7px 0}
+  .card ul li::before{content:"";position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--indigo)}
+  .card.security ul li::before{background:var(--coral)}
+  strong{color:var(--ink);font-weight:700}
+  code{background:var(--ice);color:var(--indigo-deep);padding:1.5px 6px;border-radius:5px;font-size:13px;font-family:"SFMono-Regular",Consolas,monospace}
+
+  /* Do/Dont */
+  .doblock{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:600px){.doblock{grid-template-columns:1fr}}
+  .dont,.do{border-radius:12px;padding:16px 18px}
+  .dont{background:#FFF5F2;border:1px solid #FECdca}
+  .do{background:#ECFDF5;border:1px solid #A7F3D0}
+  .dont h4,.do h4{font-size:13px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .dont h4{color:var(--coral)} .do h4{color:var(--green)}
+  .dont ul li::before{background:var(--coral)} .do ul li::before{background:var(--green)}
+  .dont ul,.do ul{margin:0}
+  .dont ul li,.do ul li{font-size:13.5px;margin:5px 0}
+
+  /* Takeaway bar */
+  .takeaway{
+    background:var(--ink);border-radius:10px;margin-top:20px;padding:16px 18px;
+    display:flex;gap:14px;align-items:flex-start;
+  }
+  .takeaway .strip{flex:none;width:4px;align-self:stretch;background:var(--indigo);border-radius:3px}
+  .card.security .takeaway .strip{background:var(--coral)}
+  .takeaway .t-label{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--pale);text-transform:uppercase;margin-bottom:3px}
+  .takeaway p{margin:0;color:#fff;font-size:14px}
+
+  /* Summary table */
+  .summary{background:#fff;border:1px solid var(--border);border-radius:16px;padding:8px;margin-top:34px;overflow:hidden}
+  .summary h3{font-size:18px;color:var(--ink);font-weight:800;padding:18px 20px 12px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:12px 16px;border-top:1px solid var(--border);vertical-align:top}
+  th{background:var(--ice);color:var(--indigo-deep);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}
+  td .x{color:var(--coral);font-weight:700}
+  td .o{color:var(--green);font-weight:700}
+
+  footer{text-align:center;margin-top:40px;font-size:12.5px;color:var(--slate500)}
+  footer b{color:var(--indigo-deep)}
+
+  @media print{
+    body{background:#fff} .card,.intro,.summary{box-shadow:none;break-inside:avoid}
+    header.hero{padding:30px 20px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">기강 · Claude Code 입문 가이드</span>
+    <h1>처음 쓸 때 흔히 하는 실수 &amp; 꼭 알아야 할 것</h1>
+    <p class="lead">오늘 Claude Code를 처음 만져보는 분들을 위해, 자주 밟는 지뢰들만 추렸습니다.
+      모임원들이 직접 겪은 사례를 사실확인해 정리했어요.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="intro">
+    <h2>이 문서는 왜 있나요?</h2>
+    <p>Claude Code는 강력하지만, 처음 쓰면 <strong>돈이 새거나(과금)</strong>, <strong>보안에 걸리거나</strong>,
+      <strong>결과물이 어설프거나</strong> 하는 실수를 하기 쉽습니다.
+      아래 5가지만 미리 알아두면 대부분 피할 수 있습니다.</p>
+    <div class="who">
+      <span>기여 · 김석준</span><span>김혜빈</span><span>박송이</span><span>양현모</span>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <div class="card" id="api">
+    <div class="card-head">
+      <div class="num">1</div>
+      <div class="titles">
+        <h3>“API 키를 넣어라”는 안내를 만났을 때</h3>
+        <div class="by">제보 · <b>김석준</b> · <b>김혜빈</b></div>
+      </div>
+    </div>
+    <span class="verdict v-true">✓ 사실입니다</span>
+
+    <div class="label">어떤 상황이냐면</div>
+    <div class="memo">대부분 일부러 그러는 게 아닙니다. 작업을 시키다 보면 <strong>Claude가 “Anthropic API 키를 발급받아 이렇게 호출하면 된다”고 친절히 안내</strong>하고,
+      처음 쓰는 사람은 그게 정답인 줄 알고 그대로 따라갑니다. 그런데 그 길은 구독과 별개로 <strong>돈이 따로 나가는 종량제 경로</strong>예요.</div>
+
+    <div class="label">사실확인 &amp; 보충</div>
+    <p>과금 구조는 실제로 분리돼 있습니다.</p>
+    <ul>
+      <li><strong>구독(Pro/Max)</strong> — 매달 정해진 한도 안에서 쓰는 <strong>정액제</strong>. 한도는 주기적으로 리셋.</li>
+      <li><strong>API 키</strong> — 쓴 토큰만큼 차감하는 <strong>종량제</strong>. 콘솔에 결제수단/크레딧을 따로 등록해야 하고, 헤비하게 쓰면 구독보다 쉽게 비싸집니다.</li>
+    </ul>
+    <p>그러니 Claude가 “API 키로 이렇게 하면 됩니다”라고 제안하더라도 곧바로 받아들이지 말고,
+      <strong>“API 없이, 너(Claude Code)가 직접 처리하는 방식으로 다시 짜줘”</strong>라고 되돌려 시키세요.
+      대부분의 개발·학습 작업은 그렇게 구독 안에서 끝낼 수 있습니다.</p>
+
+    <div class="label">이렇게 돌려서 개발시키세요</div>
+    <div class="doblock">
+      <div class="dont"><h4>✕ 무심코 따라가기</h4><ul>
+        <li>“API 키 발급받아 넣으세요” → 그대로 발급·결제</li>
+        <li>도우미가 할 일을 종량제 API로 중복 결제</li>
+      </ul></div>
+      <div class="do"><h4>✓ 되돌려 시키기</h4><ul>
+        <li>“API 말고 <strong>네가 직접 해주는 방식</strong>으로 바꿔줘”</li>
+        <li>“이거 <strong>구독 안에서</strong> 가능한 방법으로 다시 설계해줘”</li>
+      </ul></div>
+    </div>
+    <p style="margin-top:12px">단, 헷갈리기 쉬운 <strong>예외</strong>가 하나 있습니다 — 만들려는 <strong>결과물 자체가 “실행 중에 스스로 AI를 호출하는 앱/자동화”</strong>라면,
+      그 프로그램이 돌아갈 때는 API 키가 불가피합니다(이건 정상). 즉 <strong>‘나를 도와주는 Claude’는 구독으로, ‘내 프로그램이 스스로 부르는 AI’만 API로</strong> 구분하면 됩니다.</p>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>Claude가 API 키를 권해도 곧장 따르지 말고 <b>“API 없이 직접 해주는 방식으로 다시 짜줘”</b>라고 되돌려 시킬 것.</p>
+    </div></div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card" id="mail">
+    <div class="card-head">
+      <div class="num">2</div>
+      <div class="titles">
+        <h3>AI로 메일·문서를 만들 때 (특히 남에게 가는 것)</h3>
+        <div class="by">제보 · <b>김혜빈</b></div>
+      </div>
+    </div>
+    <span class="verdict v-true">✓ 타당합니다</span>
+
+    <div class="label">원래 메모</div>
+    <div class="memo">“AI 요약 메일은 좋지만, 사람들이 ‘AI 냄새’를 맡으면 썩 좋아하지 않더라.
+      요약·정형화된 양식은 좋지만 마지막에 사람이 검수하는 역할은 빼지 말 것. 특히 결과물이 남에게 가는 문서일 때.
+      사람 전달용 문서는 손이 더 가고, PPT류는 특히 그렇다.”</div>
+
+    <div class="label">사실확인 &amp; 보충</div>
+    <ul>
+      <li><strong>“AI 냄새”는 실재합니다.</strong> 과한 미사여구, 똑같은 구조, 불릿 남발, 영혼 없는 정중함 — 받는 사람은 금방 알아채고 ‘성의 없다’고 느낍니다.</li>
+      <li>AI는 <strong>초안·요약·구조화</strong>엔 강하지만, <strong>이 사람·이 맥락에 맞는 톤</strong>과 <strong>사실 정확성의 최종 책임</strong>은 사람 몫입니다.</li>
+      <li>외부로 나가는 문서일수록 <strong>사람 검수(human-in-the-loop)</strong>가 필수: AI 초안 → 사람이 사실·톤·민감정보 점검 → 발송.</li>
+      <li>PPT·디자인 산출물은 텍스트/구조까진 AI가 빠르게 뽑지만, <strong>레이아웃 미세조정·브랜드 일관성</strong>은 아직 손이 많이 갑니다. “한 방에 완성”을 기대하지 마세요.</li>
+    </ul>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>AI에게 80%까지 맡기되, 마지막 20%(검수·톤·고유 정보)는 <b>반드시 사람이</b> 마무리.</p>
+    </div></div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card" id="git">
+    <div class="card-head">
+      <div class="num">3</div>
+      <div class="titles">
+        <h3>여러 컴퓨터에서 같은 작업을 이어가고 싶다면</h3>
+        <div class="by">제보 · <b>박송이</b></div>
+      </div>
+    </div>
+    <span class="verdict v-true">✓ 정확합니다</span>
+
+    <div class="label">원래 메모</div>
+    <div class="memo">“멀티 머신으로 코드 작업을 하고 싶으면 GitHub를 써보는 것이 좋을 수도 있다.”</div>
+
+    <div class="label">사실확인 &amp; 보충</div>
+    <ul>
+      <li>집·회사·노트북 등 <strong>여러 기기에서 같은 작업을 이어가는 표준 방법이 Git + GitHub</strong>(원격 저장소)입니다.</li>
+      <li>USB나 메신저로 파일을 주고받으면 곧 <strong>버전이 꼬입니다.</strong> Git은 변경 이력과 동기화를 정식으로 관리합니다.</li>
+      <li>흐름은 간단합니다: 머신 A에서 <code>commit → push</code>, 머신 B에서 <code>pull</code> 받아 이어서 작업.</li>
+      <li>덤으로 <strong>백업·되돌리기·협업</strong>까지 한 번에 해결됩니다.</li>
+    </ul>
+    <div class="doblock">
+      <div class="dont"><h4>⚠ 주의</h4><ul>
+        <li>회사 코드를 <strong>public(공개)</strong> 저장소에 올리지 않기</li>
+        <li>비밀번호·API 키를 <strong>커밋하지 않기</strong></li>
+      </ul></div>
+      <div class="do"><h4>✓ 권장</h4><ul>
+        <li><strong>private</strong> 저장소 사용</li>
+        <li>비밀키는 <code>.gitignore</code>로 제외</li>
+      </ul></div>
+    </div>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>기기 간 작업 = Git/GitHub. 단, <b>회사 코드·비밀키는 private + 커밋 금지.</b></p>
+    </div></div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card" id="freq">
+    <div class="card-head">
+      <div class="num">4</div>
+      <div class="titles">
+        <h3>“일회성 / 주기 / 상시” 부터 구분하라 (토큰 경제)</h3>
+        <div class="by">제보 · <b>양현모</b></div>
+      </div>
+    </div>
+    <span class="verdict v-mostly">✓ 타당 · 일부 일반화 필요</span>
+
+    <div class="label">원래 메모</div>
+    <div class="memo">“일회성인지 주기성인지 상시인지 구분은 항상 필요하다. 분류 없이 돌리면 — 예: 급등주 추적기인데 매 순간 전체 표와 뉴스를 1분 간격으로 AI에 분석시키면 — 토큰이 남아나지 않는다.”</div>
+
+    <div class="label">사실확인 &amp; 보충</div>
+    <p>전적으로 맞습니다. 자동화를 켜기 전에 <strong>“빈도가 곧 비용”</strong>이라는 걸 기억하세요.</p>
+    <ul>
+      <li><strong>상시</strong> (예: 급등주 추적기) — <strong>트리거 기반</strong>으로. 먼저 <strong>싼 코드 규칙으로 조건을 거르고</strong>, 조건을 만족할 때<strong>만</strong> AI 심층 분석. 매분 전체를 AI에 넣지 마세요.</li>
+      <li><strong>주기</strong> (예: 주간 매출 분석기) — 단위기간을 명확히 하고, 주기가 도래했을 때 정해진 절차로 분석.</li>
+      <li><strong>일회성</strong> (예: 현재 상황 가정 → 방향 찾기) — 탐색·의사결정 보조. <strong>대화로 충분</strong>하고, 굳이 자동화/API화할 필요 없음.</li>
+    </ul>
+    <p><strong>안티패턴:</strong> 급등주 추적기인데 1분마다 전체 종목표 + 뉴스를 통째로 AI에 던지기 →
+      99%는 “변화 없음”인데 매번 비싼 분석을 돌리니 <strong>토큰 폭발</strong>.</p>
+    <p><strong>“차라리 더 싼 GPT 토큰” 부분 보강:</strong> 진짜 요점은 <em>GPT냐 Claude냐</em>가 아니라
+      <strong>작업 난이도에 모델 등급(=비용)을 맞추는 것</strong>입니다.</p>
+    <ul>
+      <li>고빈도·단순 판별 → <strong>경량·저가 모델</strong>(예: Claude Haiku 등)로 1차 필터.</li>
+      <li>진짜 심층 분석만 → <strong>상위 모델</strong>로.</li>
+      <li>1차 필터를 <strong>아예 AI 없이 코드 규칙</strong>으로 끝낼 수 있으면 그게 가장 쌉니다.</li>
+    </ul>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>켜기 전에 <b>일회성/주기/상시</b>를 먼저 정하고, <b>싼 규칙으로 거른 뒤 비싼 AI는 마지막에만.</b></p>
+    </div></div>
+  </div>
+
+  <!-- 5 SECURITY -->
+  <div class="card security" id="login">
+    <div class="card-head">
+      <div class="num">★</div>
+      <div class="titles">
+        <h3>【최우선】 Claude에게 “로그인”을 시키지 마라</h3>
+        <div class="by">제보 · <b>양현모</b> · 보안 관련 가장 중요한 항목</div>
+      </div>
+    </div>
+    <span class="verdict v-critical">⚠ 매우 중요 — 회사 PC면 특히</span>
+
+    <div class="label">원래 메모</div>
+    <div class="memo">“Claude Code가 로그인을 하게 되면 SSO나 passkey 같은 인증 토큰을 가져가려 하는데, 이 행동이 근본적으로 해킹과 다르지 않다.
+      회사 컴퓨터에선 대부분 보안 프로그램에 걸린다. 걸리면 소명하거나 장비를 압수당하는 등 불편해진다.
+      로그인이 필요하면 Playwright·브라우저·Selenium으로 창은 열되 <strong>내가 직접 로그인</strong>하고, 그다음 작업을 자동화하라.”</div>
+
+    <div class="label">사실확인 &amp; 보충</div>
+    <ul>
+      <li>에이전트가 <strong>자동으로 로그인</strong>하는 것은 자격증명·세션 토큰을 프로그램이 가로채는 행위입니다.
+        사내 보안 솔루션(<strong>EDR/DLP</strong>)은 이를 <strong>‘크리덴셜 탈취’ 패턴</strong>으로 탐지합니다 — 의도가 선해도 <strong>행위 시그니처가 공격과 동일</strong>합니다.</li>
+      <li><strong>SSO·passkey·2FA는 “사람이 직접 인증”하라고 만든 장치</strong>입니다. 자동화가 이를 우회·대행하려는 순간 정책 위반이자 탐지 대상이 됩니다.</li>
+      <li>걸리면: 보안팀 소명, 계정 잠금, 최악의 경우 <strong>장비 회수</strong>. 시간 낭비에 신뢰까지 잃습니다.</li>
+    </ul>
+
+    <div class="label">올바른 패턴 — 사람이 로그인, 그다음만 자동화</div>
+    <ul>
+      <li>① Playwright / Selenium / 브라우저로 페이지를 <strong>사람이 보는 채로</strong> 연다.</li>
+      <li>② <strong>로그인은 내가 직접 손으로</strong> 한다 (ID/PW, 2FA, passkey).</li>
+      <li>③ 로그인된 세션 위에서 <strong>그다음 작업(메일 읽기, 목록 크롤링 등)만</strong> 자동화에 넘긴다.</li>
+    </ul>
+    <p style="margin-top:12px">예: 네이버 메일을 읽어와야 하거나 쇼핑 목록을 크롤링해야 하는데 로그인이 필요하면 — 브라우저는 자동화로 띄우되 <strong>로그인 단계에서 멈추고 사람이 인증</strong>, 그 뒤부터 작업을 이어가게 워크플로우를 짜세요.</p>
+
+    <div class="doblock">
+      <div class="dont"><h4>✕ 절대 하지 말 것</h4><ul>
+        <li>스크립트에 회사 계정 비번 하드코딩</li>
+        <li>에이전트에게 로그인 자동 통과 시키기</li>
+        <li>SSO/passkey/2FA 우회 시도</li>
+      </ul></div>
+      <div class="do"><h4>✓ 이렇게</h4><ul>
+        <li>로그인은 항상 사람이 직접</li>
+        <li>인증 끝난 세션부터 자동화</li>
+        <li>회사 정책이 의심되면 먼저 확인</li>
+      </ul></div>
+    </div>
+
+    <div class="takeaway"><div class="strip"></div><div>
+      <div class="t-label">핵심</div>
+      <p>로그인은 <b>무조건 사람 손으로.</b> AI가 인증을 대행하는 순간 보안엔 ‘해킹’으로 보인다.</p>
+    </div></div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <h3>한 장 요약</h3>
+    <table>
+      <thead><tr><th>상황</th><th>하지 말 것</th><th>대신 이렇게</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Claude가 API 키를 권할 때</td>
+          <td><span class="x">✕</span> 안내대로 발급·결제해서 따라가기</td>
+          <td><span class="o">✓</span> “API 없이 직접 해주는 방식으로 다시 짜줘”</td>
+        </tr>
+        <tr>
+          <td>AI로 메일·문서</td>
+          <td><span class="x">✕</span> AI 초안 그대로 발송</td>
+          <td><span class="o">✓</span> 사람이 톤·사실·민감정보 최종 검수</td>
+        </tr>
+        <tr>
+          <td>여러 기기 작업</td>
+          <td><span class="x">✕</span> USB·메신저로 파일 복사</td>
+          <td><span class="o">✓</span> Git/GitHub(private), 비밀키 커밋 금지</td>
+        </tr>
+        <tr>
+          <td>자동화 설계</td>
+          <td><span class="x">✕</span> 매분 전체를 비싼 AI에 분석</td>
+          <td><span class="o">✓</span> 분류 먼저 → 싼 규칙으로 거른 뒤 AI</td>
+        </tr>
+        <tr>
+          <td>로그인 필요</td>
+          <td><span class="x">✕</span> AI에게 로그인 시키기</td>
+          <td><span class="o">✓</span> 사람이 직접 인증 → 그다음만 자동화</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    <p><b>기강</b> · Claude Code 입문 주의사항 · 모임원 제보 기반 정리</p>
+  </footer>
+
+</div>
+</body>
+</html>
