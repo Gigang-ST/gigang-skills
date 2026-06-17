@@ -4,83 +4,66 @@
 
 엑셀 자동화, 데이터 정리, 반복 작업 자동화 등 비개발자도 AI 를 바로 활용할 수 있게 환경을 셋업해줍니다.
 
-## 설치 (Windows)
+## 설치 (Claude Code 플러그인)
 
-> **사전 — PowerShell 실행 정책**: 신규 PC가 `Restricted` 정책이면 스크립트 실행이 막힙니다. 한 번만:
->
-> ```powershell
-> Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-> ```
-
-### 방법 A — Claude에게 시키기 (Claude Code 설치된 경우)
-
-Claude Code 에 아래 프롬프트를 붙여넣으세요:
+Claude Code 에서 아래 두 명령을 순서대로 실행합니다:
 
 ```
-gigang-skills 설치해줘.
-
-repo: https://github.com/Gigang-ST/gigang-skills
-설치 경로: C:\Prog\gigang-skills
-
-아래 순서대로 진행해. 각 단계 결과를 [OK]/[FAIL] 로 보고해줘.
-
-**0. git 설치**
-winget install -e --id Git.Git --accept-package-agreements --accept-source-agreements
-$env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')
-
-**1. repo clone**
-if (Test-Path "C:\Prog\gigang-skills") { Remove-Item -Recurse -Force "C:\Prog\gigang-skills" }
-git clone https://github.com/Gigang-ST/gigang-skills.git C:\Prog\gigang-skills
-
-**2. install.ps1 실행**
-& "C:\Prog\gigang-skills\install.ps1"
-
-**3. /gigang-init 호출**
-
-완료 후 반드시 이렇게 안내해줘:
-"설치 완료. → 새 PowerShell 창 하나 열어주세요 (PATH·cc alias 적용) → 새 창에서: cc 로 Claude Code 시작"
+/plugin marketplace add Gigang-ST/gigang-skills
+/plugin install gigang@gigang-skills
 ```
 
-### 방법 B — 직접 설치
-
-1. GitHub 페이지에서 `Code` → `Download ZIP`
-2. 압축 풀기
-3. 풀린 폴더에서 PowerShell 열고: `.\install.ps1`
-
-설치 위치:
-- 슬래시 커맨드: `%USERPROFILE%\.claude\commands\<name>.md`
-- 훅 스크립트: `%USERPROFILE%\.claude\hooks\<name>.py`
-
-업데이트: **자동** — SessionStart hook이 매 Claude Code 세션 시작 시 백그라운드로 `git fetch + pull + install.ps1` 재실행.
+> **자동 업데이트**: 서드파티 마켓플레이스 등록 플러그인은 기본적으로 자동 업데이트가 비활성일 수 있습니다. `/plugin` 명령으로 업데이트 정책을 확인하세요.
 
 ### 사전 준비 — `uv` (프롬프트 로그용)
 
+**Windows**:
 ```powershell
 irm https://astral.sh/uv/install.ps1 | iex
+```
+
+**macOS / Linux**:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 로그 위치: `~/.claude/logs/prompts/<project-name>/YYYY-MM-DD.md`
 
 > **평문 저장 주의**: API 키·비밀번호 등을 Claude 에 직접 입력하지 마세요. 로컬에만 저장되며 외부 전송은 없습니다.
 
+## 기존 멤버 마이그레이션
+
+이전에 `install.ps1` 방식으로 설치한 멤버는 `~/.claude/` 아래 파일 잔재가 남아 플러그인과 충돌할 수 있습니다. 플러그인 설치 전에 `/gigang-help` 를 실행하면 마이그레이션 점검·정리 절차를 안내합니다.
+
 ## 들어있는 명령
 
 | 명령 | 용도 |
 |------|------|
-| `/gigang-init` | 신규 멤버 환경 초기 셋업 (git, gh, PowerShell 7, uv, cc alias) |
+| `/gigang-init` | 신규 멤버 환경 초기 셋업 (git, gh, uv, cc alias, 플러그인) |
+| `/gigang-help` | 사용법 안내 + 기존 설치 마이그레이션 점검 |
+| `/gigang-version` | 설치된 버전 및 업데이트 상태 확인 |
+
+**자연어 스킬** (슬래시 없이 말로 발동):
+
+| 발동 표현 | 스킬 |
+|-----------|------|
+| "기강 환경 셋업해줘", "기강 도움말" | `gigang` (자연어 라우터) |
+| "어제 뭐했더라", "지난주 작업 정리해줘" | `gigang-뭐했더라` |
+| "폴더 구조 잡아줘", "폴더 정리해줘" | `gigang-folder-guide` |
+| "버그 보고해줘", "이슈 올려줘" | `gigang-report` |
 
 ## 신규 멤버 첫 셋업
 
-설치 끝났으면 한 번만:
+플러그인 설치 후 한 번만:
 
 ```
 claude --dangerously-skip-permissions
 /gigang-init
 ```
 
-이게 git, gh, PowerShell 7, uv 설치부터 cc 단축어, Claude Code 플러그인(superpowers)까지 한 번에 처리. 끝나면:
+이게 git, gh, uv 설치부터 cc 단축어, Claude Code 플러그인(superpowers)까지 한 번에 처리. 끝나면:
 
-1. 새 PowerShell 창 열기 (PATH 갱신)
+1. 새 터미널 창 열기 (PATH 갱신)
 2. `cc` 로 Claude Code 다시 시작
 
 `/gigang-init` 은 멱등 — 재실행해도 안전.
@@ -95,7 +78,7 @@ claude --dangerously-skip-permissions
 
 - **무슨 일이 있었나** (예: `/gigang-init` 실행했더니 `[FAIL] uv` 떴다)
 - **어떻게 됐으면 좋겠나** (예: uv가 자동으로 설치됐으면 좋겠다)
-- **PC 환경** — Windows 버전, 어떤 방법으로 설치했는지 (방법 A/B)
+- **PC 환경** — OS, 어떤 방법으로 설치했는지
 
 형식 없이 한국어로 자유롭게 써도 됩니다.
 

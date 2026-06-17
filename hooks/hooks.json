@@ -1,0 +1,19 @@
+{
+  "description": "gigang 프롬프트/응답 로그 + Opus 권장 감지",
+  "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [
+        { "type": "command", "command": "uv run --no-project python",
+          "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/log_prompt.py"], "timeout": 10 },
+        { "type": "command", "command": "uv run --no-project python",
+          "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/opus_suggest.py"], "timeout": 3 }
+      ]}
+    ],
+    "Stop": [
+      { "hooks": [
+        { "type": "command", "command": "uv run --no-project python",
+          "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/log_response.py"], "timeout": 15 }
+      ]}
+    ]
+  }
+}

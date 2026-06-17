@@ -11,7 +11,7 @@ Gigang Skills 사용 중 발생한 문제·에러·개선 아이디어를 GitHub
 
 ### 1. gh CLI 확인
 
-```powershell
+```bash
 gh auth status 2>&1
 ```
 
@@ -21,7 +21,10 @@ gh auth status 2>&1
 gh (GitHub CLI)가 필요합니다.
 
 1. 설치 (이미 있으면 skip):
-   winget install GitHub.cli
+   case "$(uname)" in
+     Darwin) brew install gh ;;
+     *) winget install -e --id GitHub.cli ;;
+   esac
 
 2. 로그인 (새 PowerShell 창에서):
    gh auth login
@@ -88,7 +91,7 @@ AskUserQuestion으로 추가 정보를 받는다:
 
 ## 환경
 - 보고자: {git config user.name}
-- Gigang Skills 버전: {git -C ~/.gigang-skills log --oneline -1 2>/dev/null 또는 C:\Prog\gigang-skills}
+- Gigang Skills 버전: {git -C "$(ls -d ~/.claude/plugins/*/gigang 2>/dev/null | head -1)" log --oneline -1 2>/dev/null}
 ```
 
 **본문 형식 (개선/기능/기타):**
@@ -120,11 +123,11 @@ A 선택 시:
 
 **gh 사용 가능한 경우:**
 
-```powershell
-gh issue create `
-  --repo Gigang-ST/gigang-skills `
-  --title "<제목>" `
-  --body "<본문>" `
+```bash
+gh issue create \
+  --repo Gigang-ST/gigang-skills \
+  --title "<제목>" \
+  --body "<본문>" \
   --label "<label>"
 ```
 

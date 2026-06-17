@@ -12,10 +12,10 @@ description: 기강 멤버를 위한 대화형 폴더 구조 가이드. "폴더 
 
 ### 1. 현재 디렉토리 스캔
 
-PowerShell로 **루트만** 확인한다 (-Depth 0):
+bash로 **루트만** 확인한다 (1단계만):
 
-```powershell
-Get-ChildItem -Path "." -Depth 0 | Select-Object Name, PSIsContainer | Format-Table -AutoSize
+```bash
+ls -1p .
 ```
 
 기존 파일이 있으면 나중에 이동 여부를 물어봐야 함을 기억해 둔다.
@@ -38,7 +38,7 @@ Other 입력 시 사용자 설명을 듣고 가장 가까운 유형을 선택하
 ### 3. 폴더 구조 제안 출력
 
 스킬 Base directory의 `templates.md` 를 Read 도구로 읽어 해당 유형의 구조를 트리 형태로 출력한다.
-(Base directory는 스킬 로드 시 상단에 표시됨 — 예: `C:\Users\...\skills\gigang-folder-guide\templates.md`)
+(Base directory는 스킬 로드 시 상단에 표시됨 — 예: `~/.claude/.../skills/gigang-folder-guide/templates.md`)
 
 복합·Other 선택 시 관련 유형들의 폴더를 합친 구조를 제안한다 (중복 폴더 제거).
 
@@ -56,16 +56,16 @@ Other 입력 시 사용자 설명을 듣고 가장 가까운 유형을 선택하
 
 ### 5. 폴더 생성
 
-사용자 확인 후 PowerShell로 폴더를 생성한다:
+사용자 확인 후 bash로 폴더를 생성한다:
 
-```powershell
+```bash
 # 예시: 데이터 분석형
-New-Item -ItemType Directory -Force "data\raw"
-New-Item -ItemType Directory -Force "data\processed"
-New-Item -ItemType Directory -Force "analysis"
-New-Item -ItemType Directory -Force "outputs\figures"
-New-Item -ItemType Directory -Force "outputs\reports"
-New-Item -ItemType Directory -Force "docs"
+mkdir -p "data/raw"
+mkdir -p "data/processed"
+mkdir -p "analysis"
+mkdir -p "outputs/figures"
+mkdir -p "outputs/reports"
+mkdir -p "docs"
 ```
 
 ### 6. 루트 파일 생성
@@ -76,7 +76,7 @@ New-Item -ItemType Directory -Force "docs"
 ### 7. 기존 파일 이동 (Step 4에서 A 선택 시)
 
 파일 목록을 보여주며 AskUserQuestion으로 각 파일의 이동 위치를 확인한다.  
-확인 후 PowerShell `Move-Item`으로 이동한다.
+확인 후 bash `mv`로 이동한다.
 
 ### 8. 경로 참조 업데이트
 
@@ -103,8 +103,8 @@ Grep으로 이전 경로 패턴을 스캔한다:
 
 CLAUDE.md가 있으면 줄 수를 확인:
 
-```powershell
-(Get-Content CLAUDE.md | Measure-Object -Line).Lines
+```bash
+wc -l CLAUDE.md
 ```
 
 150줄 초과이면 AskUserQuestion으로 분리 여부 확인:
