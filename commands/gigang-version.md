@@ -20,8 +20,8 @@ fi
 plugin_dir=$(dirname "$(dirname "$plugin_json")")
 ver=$(grep '"version"' "$plugin_json" | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
 
-cmd_count=$(ls "$plugin_dir/commands/"gigang-*.md 2>/dev/null | wc -l | tr -d ' ')
-skill_count=$(ls -d "$plugin_dir/skills/"gigang* 2>/dev/null | wc -l | tr -d ' ')
+cmd_count=$(ls "$plugin_dir/commands/gigang-"*.md 2>/dev/null | wc -l | tr -d ' ')
+skill_count=$(ls -d "$plugin_dir/skills/gigang"* 2>/dev/null | wc -l | tr -d ' ')
 ```
 
 ## 결과 표시
