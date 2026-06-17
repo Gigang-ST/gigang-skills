@@ -1,11 +1,11 @@
 ---
-description: 기강 AI 활용 환경 초기 셋업 — winget 패키지, cc alias, Claude Code 플러그인
+description: 기강 AI 활용 환경 초기 셋업 — 필수 패키지(git, gh, uv 등), cc alias, Claude Code 플러그인
 model: claude-haiku-4-5
 ---
 
 기강 러닝크루 멤버용 Claude Code 환경 셋업. 한 번 호출하면 필수 패키지, cc alias, Claude Code 플러그인까지 한 번에 처리. 모든 단계 멱등 — 다시 돌려도 안전.
 
-**중요**: 처음 한 번은 `claude --dangerously-skip-permissions` 모드로 호출하세요. winget/git/`claude plugin install` 등 외부 명령마다 권한 프롬프트가 뜨면 부담스럽습니다. 끝나면 `cc` 단축어가 만들어지므로 이후엔 자동.
+**중요**: 처음 한 번은 `claude --dangerously-skip-permissions` 모드로 호출하세요. git/gh/uv/`claude plugin install` 등 외부 명령마다 권한 프롬프트가 뜨면 부담스럽습니다. 끝나면 `cc` 단축어가 만들어지므로 이후엔 자동.
 
 ## Phase 0 — 작업 폴더 결정
 

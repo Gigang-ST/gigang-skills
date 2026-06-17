@@ -6,16 +6,32 @@ Gigang Skills 사용법 문서를 그대로 표시한다.
 
 ## 실행
 
-플러그인 설치 여부를 확인한다:
+플러그인 디렉토리를 결정한다:
 
 ```bash
-ls ~/.claude/plugins/*/gigang 2>/dev/null && echo "설치됨" || echo "미설치 — /plugin install gigang@gigang-skills"
+plugin_dir="${CLAUDE_PLUGIN_ROOT:-}"
+if [ -z "$plugin_dir" ]; then
+  pj=$(find ~/.claude/plugins/cache -path '*/gigang/*/.claude-plugin/plugin.json' 2>/dev/null | head -1)
+  [ -n "$pj" ] && plugin_dir=$(dirname "$(dirname "$pj")")
+fi
+if [ -n "$plugin_dir" ] && [ -d "$plugin_dir" ]; then
+  echo "설치됨: $plugin_dir"
+  cat "$plugin_dir/docs/gigang-usage.md"
+else
+  echo "미설치 — 아래로 설치하세요:"
+  echo "  /plugin marketplace add Gigang-ST/gigang-skills"
+  echo "  /plugin install gigang@gigang-skills"
+fi
 ```
 
 미설치 메시지가 출력되면:
-> Gigang Skills 플러그인이 설치되어 있지 않습니다. `/plugin marketplace add Gigang-ST/gigang-skills` 를 실행하세요.
+> Gigang Skills 플러그인이 설치되어 있지 않습니다. 아래 명령으로 설치하세요.
+> ```
+> /plugin marketplace add Gigang-ST/gigang-skills
+> /plugin install gigang@gigang-skills
+> ```
 
-설치됨 메시지가 출력되면 Read 도구로 `~/.claude/plugins/gigang/docs/gigang-usage.md` 를 읽어 **내용을 수정·요약 없이 그대로 출력**한다.
+설치됨 메시지가 출력되면 위 bash 블록이 이미 `cat`으로 출력한 내용을 **수정·요약 없이 그대로 출력**한다.
 
 ---
 
@@ -52,6 +68,7 @@ rm -rf ~/.gigang-skills
 
 ### 4단계: 플러그인 재설치
 
-```bash
+```
 /plugin marketplace add Gigang-ST/gigang-skills
+/plugin install gigang@gigang-skills
 ```
