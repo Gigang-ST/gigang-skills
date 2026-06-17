@@ -5,10 +5,12 @@
 | 명령 | 용도 |
 |------|------|
 | `/gigang-init` | 신규 멤버 환경 초기 셋업 |
-| `/gigang-help` | 이 사용법 문서 표시 |
+| `/gigang-help` | 이 사용법 문서 표시 + 마이그레이션 점검 |
 | `/gigang-version` | 설치된 버전 및 업데이트 상태 확인 |
 | `/gigang-folder-guide` | 대화형 폴더 구조 생성 및 정리 |
 | `/gigang-report` | 버그·개선 아이디어를 GitHub Issue로 제출 |
+
+> **호출명 확인**: 플러그인으로 설치된 커맨드·스킬의 정확한 호출명(예: `gigang:gigang-init` 형태인지)은 설치 후 `/help` 로 확인하세요.
 
 **자연어 스킬** (슬래시 없이 말로 발동):
 
@@ -19,18 +21,29 @@
 | "폴더 구조 잡아줘", "폴더 정리해줘" | `gigang-folder-guide` |
 | "버그 보고해줘", "이슈 올려줘" | `gigang-report` |
 
+## 설치 / 업데이트
+
+Claude Code 에서:
+
+```
+/plugin marketplace add Gigang-ST/gigang-skills
+/plugin install gigang@gigang-skills
+```
+
+서드파티 마켓플레이스 플러그인은 기본적으로 자동 업데이트가 비활성일 수 있습니다. `/plugin` 명령으로 업데이트 정책을 확인하세요.
+
 ## /gigang-init
 
 **용도**: 기강 멤버의 Claude Code 환경을 한 번에 셋업.
 
 **설치 항목**:
-- `git`, `gh` (GitHub CLI), PowerShell 7, uv (Python 실행기)
-- Windows Terminal 기본 프로파일 → PowerShell 7, 시작 디렉토리 설정
-- D2Coding 폰트 설치 + Windows Terminal 글씨체 적용
+- `git`, `gh` (GitHub CLI), uv (Python 실행기)
+- Windows: PowerShell 7, Windows Terminal 기본 프로파일 설정, D2Coding 폰트
 - `cc` alias (`claude --dangerously-skip-permissions`)
 - `~/.claude/CLAUDE.md` uv 문구
 - Claude Code 플러그인: superpowers
 - gstack (웹 브라우저 자동화 스킬 모음) — `~/.claude/skills/gstack` 클론 + CLAUDE.md gstack 섹션
+- 디폴트 모델: `claude-sonnet-4-6`
 
 **실행**:
 ```
@@ -38,7 +51,7 @@ claude --dangerously-skip-permissions
 /gigang-init
 ```
 
-멱등 — 재실행해도 안전.
+멱등 — 재실행해도 안전. OS를 자동 감지해 macOS / Windows 각각 적합한 셋업 실행.
 
 ## 프롬프트/응답 로그
 
@@ -46,15 +59,21 @@ claude --dangerously-skip-permissions
 
 로그 위치: `~/.claude/logs/prompts/<project-name>/YYYY-MM-DD.md`
 
-비활성화: `~/.claude/settings.json` 에서 `UserPromptSubmit` / `Stop` 항목 제거.
+비활성화: `hooks/hooks.json` 의 선언에 따라 플러그인이 hook을 등록합니다. hook을 끄려면 `~/.claude/settings.json` 에서 해당 훅 항목을 제거하세요.
 
 > **평문 저장 주의**: API 키·비밀번호 등을 prompt에 직접 입력하지 마세요.
 
 ## 자동 업데이트
 
-SessionStart hook이 매 Claude Code 세션 시작 시 백그라운드로 `git fetch + pull + install.ps1` 재실행. 별도 작업 불필요.
+플러그인 시스템이 업데이트를 관리합니다. `/plugin` 명령으로 현재 버전 및 업데이트 가능 여부를 확인하세요.
 
-비활성화: `~/.claude/settings.json` 의 `hooks.SessionStart` 에서 `update.ps1` 항목 제거.
+## /gigang-help
+
+**용도**: 이 사용법 문서(`docs/gigang-usage.md`)를 그대로 출력. 또한 기존 `install.ps1` 방식으로 설치한 멤버를 위한 마이그레이션 점검·정리 절차를 안내합니다.
+
+## /gigang-version
+
+**용도**: 설치된 Gigang Skills 버전, repo 위치, 최신 여부 표시.
 
 ## /gigang-folder-guide
 
@@ -100,14 +119,6 @@ SessionStart hook이 매 Claude Code 세션 시작 시 백그라운드로 `git f
 
 Issue 제출처: https://github.com/Gigang-ST/gigang-skills/issues
 
-## /gigang-version
-
-**용도**: 설치된 Gigang Skills 버전, repo 위치, 최신 여부 표시.
-
-## /gigang-help
-
-**용도**: 이 사용법 문서(`docs/gigang-usage.md`)를 그대로 출력.
-
 ## gigang (자연어 라우터 스킬)
 
 **용도**: 슬래시 명령을 외울 필요 없이 평소 말투로 기강 작업 시작.
@@ -122,25 +133,4 @@ Issue 제출처: https://github.com/Gigang-ST/gigang-skills/issues
 
 기강 멤버 대상 Agentic AI 교육 커리큘럼. 4brain-skills 교육 자료를 기강 브랜드로 적용.
 
-| 파일 | 내용 |
-|------|------|
-| `education/draft_md/00-index.md` | 커리큘럼 인덱스 및 시간표 |
-| `education/draft_md/01-why.md` | 왜 Agentic AI인가 |
-| `education/draft_md/02-concepts.md` | 핵심 용어 (토큰·컨텍스트·MCP 등) |
-| `education/draft_md/03-setup.md` | Claude Code + gigang-skills 설치 가이드 |
-| `education/draft_md/04-usage.md` | 기본 사용법 & 단축키 |
-| `education/draft_md/05-security.md` | 주의사항 & 보안 |
-| `education/draft_md/06-gigang.md` | 기강 스킬 활용 (자동 로그·팀 도구) |
-| `education/draft_md/appendix/` | A~G: Git, uv, 프롬프트, CLAUDE.md, MCP, 자동화, 폴더구조 |
-| `education/draft_md/appendix/H-gigang-뭐했더라.md` | 과거 세션 조회 — 커리큘럼 이후 추가 기능 |
-
-### PPT 제작 도구
-
-| 파일 | 용도 |
-|------|------|
-| `education/ppt/design.md` | 기강 PPT 디자인 시스템 (색상·폰트·레이아웃) |
-| `education/ppt/GIGANG_PPT_Design_System_Prompt.md` | Claude에게 붙여넣는 슬라이드 제작 프롬프트 |
-
-**PPT 제작 시**: `GIGANG_PPT_Design_System_Prompt.md` 전체를 Claude에 붙여넣은 뒤 슬라이드 내용을 요청.
-
-**로고 위치**: `C:\Prog\PRIVATE\gigang-client\public\logo.webp` (흑백), `logo_white.webp` (흰색)
+**PPT 제작 시**: `education/ppt/GIGANG_PPT_Design_System_Prompt.md` 전체를 Claude에 붙여넣은 뒤 슬라이드 내용을 요청.
