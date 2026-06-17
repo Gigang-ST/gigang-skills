@@ -84,7 +84,7 @@ AskUserQuestion으로 추가 정보를 받는다:
 {파악된 재현 절차, 모르면 "미확인"}
 
 ## 관련 스킬/커맨드
-{예: skills/gigang-folder-guide, commands/gigang-init}
+{예: skills/folder-guide, commands/init}
 
 ## 기대 동작
 {어떻게 됐어야 하는지}
