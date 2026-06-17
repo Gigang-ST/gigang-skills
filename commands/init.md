@@ -234,7 +234,7 @@ gh auth status 2>&1
 ```
 
 인증 안 된 경우 → 이슈 생성 skip, 아래 안내만 출력:
-> gh 인증이 필요합니다. `gh auth login` 실행 후 `/gigang-init` 을 다시 호출하면 자동으로 이슈가 등록됩니다.
+> gh 인증이 필요합니다. `gh auth login` 실행 후 `/gigang:init` 을 다시 호출하면 자동으로 이슈가 등록됩니다.
 > 지금 바로 올리려면: https://github.com/Gigang-ST/gigang-skills/issues/new
 
 인증된 경우 → OS 버전과 실패 항목 목록을 포함한 이슈 생성:
@@ -246,7 +246,7 @@ FAIL_LINES="..." # Phase 3에서 캡처한 [FAIL] 줄들
 
 gh issue create \
     --repo Gigang-ST/gigang-skills \
-    --title "[gigang-init] FAIL 항목 발생" \
+    --title "[gigang:init] FAIL 항목 발생" \
     --body "## 환경
 - OS: $OS_VER
 
@@ -254,7 +254,7 @@ gh issue create \
 $FAIL_LINES
 
 ## 재현 방법
-/gigang-init 실행" \
+/gigang:init 실행" \
     --label "bug"
 ```
 
@@ -275,12 +275,12 @@ $body = @"
 $failLines
 
 ## 재현 방법
-/gigang-init 실행
+/gigang:init 실행
 "@
 
 gh issue create `
     --repo Gigang-ST/gigang-skills `
-    --title "[gigang-init] $($failLines.Count)개 항목 실패" `
+    --title "[gigang:init] $($failLines.Count)개 항목 실패" `
     --body $body `
     --label "bug"
 ```

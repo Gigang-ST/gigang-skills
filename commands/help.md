@@ -44,7 +44,7 @@ fi
 
 ```bash
 echo "=== 기존 install.ps1 잔재 점검 ==="
-ls ~/.claude/commands/gigang-*.md 2>/dev/null && echo "↑ 플러그인과 중복 — 삭제 권장"
+ls ~/.claude/commands/gigang-*.md 2>/dev/null && echo "↑ 구 install.ps1 잔재 — 삭제 권장"
 ls -d ~/.claude/skills/gigang* 2>/dev/null
 grep -l "update.ps1\|log_prompt\|opus_suggest" ~/.claude/settings.json 2>/dev/null && \
   echo "↑ settings.json 에 구 hook 등록됨 — 수동 삭제 필요"

@@ -1,5 +1,5 @@
 ---
-name: gigang-folder-guide
+name: folder-guide
 description: 기강 멤버를 위한 대화형 폴더 구조 가이드. "폴더 구조 잡아줘", "폴더 정리해줘", "프로젝트 디렉토리 만들어줘" 등으로 발동.
 ---
 
@@ -38,7 +38,7 @@ Other 입력 시 사용자 설명을 듣고 가장 가까운 유형을 선택하
 ### 3. 폴더 구조 제안 출력
 
 스킬 Base directory의 `templates.md` 를 Read 도구로 읽어 해당 유형의 구조를 트리 형태로 출력한다.
-(Base directory는 스킬 로드 시 상단에 표시됨 — 예: `~/.claude/.../skills/gigang-folder-guide/templates.md`)
+(Base directory는 스킬 로드 시 상단에 표시됨 — 예: `~/.claude/.../skills/folder-guide/templates.md`)
 
 복합·Other 선택 시 관련 유형들의 폴더를 합친 구조를 제안한다 (중복 폴더 제거).
 

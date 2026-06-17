@@ -1,5 +1,5 @@
 ---
-name: gigang-report
+name: report
 description: Gigang Skills 사용 중 에러·문제·개선 아이디어를 GitHub Issue로 제출. "리포트 올려줘", "버그 보고해줘", "이슈 올려줘", "에러 났어", "문제 제보해줘" 등으로 발동. Gigang Skills 자체 문제 맥락이 명확할 때만 발동.
 ---
 
@@ -30,7 +30,7 @@ gh (GitHub CLI)가 필요합니다.
    gh auth login
    → "GitHub.com" 선택 → "HTTPS" 선택 → "Login with a web browser" 선택 → 브라우저에서 코드 입력
 
-3. 완료 후 이 창에서 다시 "/gigang-report" 실행하거나
+3. 완료 후 이 창에서 다시 "/gigang:report" 실행하거나
    직접 올리려면: https://github.com/Gigang-ST/gigang-skills/issues/new
 ```
 
@@ -84,7 +84,7 @@ AskUserQuestion으로 추가 정보를 받는다:
 {파악된 재현 절차, 모르면 "미확인"}
 
 ## 관련 스킬/커맨드
-{예: skills/gigang-folder-guide, commands/gigang-init}
+{예: skills/folder-guide, commands/init}
 
 ## 기대 동작
 {어떻게 됐어야 하는지}

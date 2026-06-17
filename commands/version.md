@@ -25,8 +25,8 @@ fi
 plugin_json="$plugin_dir/.claude-plugin/plugin.json"
 ver=$(grep '"version"' "$plugin_json" | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
 
-cmd_count=$(ls "$plugin_dir/commands/gigang-"*.md 2>/dev/null | wc -l | tr -d ' ')
-skill_count=$(ls -d "$plugin_dir/skills/gigang"* 2>/dev/null | wc -l | tr -d ' ')
+cmd_count=$(ls "$plugin_dir/commands/"*.md 2>/dev/null | wc -l | tr -d ' ')
+skill_count=$(ls -d "$plugin_dir/skills/"* 2>/dev/null | wc -l | tr -d ' ')
 ```
 
 ## 결과 표시
@@ -38,8 +38,8 @@ Gigang Skills  v<ver>
   Plugin  : <plugin_dir>
   Version : <ver>
 
-  설치된 명령: <cmd_count>개  (gigang-*.md)
-  설치된 스킬: <skill_count>개  (gigang-*)
+  설치된 명령: <cmd_count>개
+  설치된 스킬: <skill_count>개
 ```
 
 ## 흔한 상황

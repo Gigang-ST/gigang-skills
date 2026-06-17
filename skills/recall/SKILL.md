@@ -1,9 +1,9 @@
 ---
-name: gigang-뭐했더라
+name: recall
 description: "어제 뭐했더라", "저번에 뭐했더라", "지난주에 뭐했지", "5/13에 뭐했지" 처럼 과거 Claude 세션 작업 내역이 궁금할 때 발동. 현재 프로젝트 로그만 기본 조회. "전체" 키워드 시 모든 프로젝트 조회.
 ---
 
-# gigang-뭐했더라
+# gigang:recall (뭐했더라)
 
 `~/.claude/logs/prompts/{프로젝트}/{날짜}.md` 로그를 읽어 작업 내역을 요약해주는 스킬.
 
