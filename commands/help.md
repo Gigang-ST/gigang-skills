@@ -41,12 +41,14 @@ fi
 
 ### 가장 쉬운 방법: 마이그레이션 스크립트 (권장)
 
-repo 의 `scripts/migrate.*` 가 잔재 정리 + 플러그인 설치를 한 번에 처리한다. (settings.json 은 변경 전 자동 백업, 4brain 공용 hook 은 보존)
+`scripts/migrate.*` 가 잔재 정리 + 플러그인 설치를 한 번에 처리한다. (settings.json 은 변경 전 자동 백업, 4brain 공용 hook 은 보존)
 
-- Windows: `powershell -ExecutionPolicy Bypass -File scripts\migrate.ps1`
-- macOS/Linux: `bash scripts/migrate.sh`
+repo 없이 한 줄로:
 
-스크립트를 못 받는 멤버는 아래 수동 절차를 따른다.
+- Windows: `irm https://raw.githubusercontent.com/Gigang-ST/gigang-skills/main/scripts/migrate.ps1 -OutFile "$env:TEMP\gm.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\gm.ps1"`
+- macOS/Linux: `curl -fsSL https://raw.githubusercontent.com/Gigang-ST/gigang-skills/main/scripts/migrate.sh | bash`
+
+repo 를 받아둔 경우 로컬 실행: `scripts\migrate.ps1` / `bash scripts/migrate.sh`. 스크립트를 못 쓰는 멤버는 아래 수동 절차를 따른다.
 
 ### (수동) 1단계: 잔재 점검
 

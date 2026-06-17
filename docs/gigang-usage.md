@@ -34,12 +34,14 @@ Claude Code 에서:
 
 ### 기존 install.ps1 멤버 → 플러그인 전환
 
-예전 `install.ps1` 로 깐 멤버는 마이그레이션 스크립트로 잔재 정리 + 플러그인 설치를 한 번에 처리합니다 (settings.json 자동 백업, 4brain 공용 hook 보존):
+예전 `install.ps1` 로 깐 멤버는 마이그레이션 스크립트로 잔재 정리 + 플러그인 설치를 한 번에 처리합니다 (settings.json 자동 백업, 4brain 공용 hook 보존).
 
-- Windows: `powershell -ExecutionPolicy Bypass -File scripts\migrate.ps1`
-- macOS/Linux: `bash scripts/migrate.sh`
+**repo 없이 한 줄로**:
 
-수동 절차는 `/gigang:help` 가 안내합니다.
+- Windows: `irm https://raw.githubusercontent.com/Gigang-ST/gigang-skills/main/scripts/migrate.ps1 -OutFile "$env:TEMP\gm.ps1"; powershell -ExecutionPolicy Bypass -File "$env:TEMP\gm.ps1"`
+- macOS/Linux: `curl -fsSL https://raw.githubusercontent.com/Gigang-ST/gigang-skills/main/scripts/migrate.sh | bash`
+
+repo 를 받아둔 경우 로컬 실행: `scripts\migrate.ps1` / `bash scripts/migrate.sh`. 수동 절차는 `/gigang:help` 가 안내합니다.
 
 ## /gigang:init
 
