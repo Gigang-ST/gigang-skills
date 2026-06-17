@@ -33,7 +33,12 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ## 기존 멤버 마이그레이션
 
-이전에 `install.ps1` 방식으로 설치한 멤버는 `~/.claude/` 아래 파일 잔재가 남아 플러그인과 충돌할 수 있습니다. 플러그인 설치 전에 `/gigang:help` 를 실행하면 마이그레이션 점검·정리 절차를 안내합니다.
+이전에 `install.ps1` 방식으로 설치한 멤버는 `~/.claude/` 아래 파일 잔재가 남아 플러그인과 충돌할 수 있습니다. 마이그레이션 스크립트가 잔재 정리 + 플러그인 설치를 한 번에 처리합니다 (settings.json 자동 백업, 4brain 공용 hook 보존):
+
+- Windows: `powershell -ExecutionPolicy Bypass -File scripts\migrate.ps1`
+- macOS/Linux: `bash scripts/migrate.sh`
+
+수동으로 하려면 `/gigang:help` 가 점검·정리 절차를 안내합니다.
 
 ## 들어있는 명령
 

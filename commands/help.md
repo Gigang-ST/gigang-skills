@@ -38,9 +38,17 @@ fi
 ## 기존 install.ps1 멤버 → 플러그인 마이그레이션 안내
 
 과거 `install.ps1`로 설치한 멤버는 `~/.claude/` 아래 파일 잔재가 남아 플러그인과 충돌할 수 있다.
-아래 점검 블록을 실행해 잔재를 확인하고, 발견되면 정리 후 플러그인을 설치한다.
 
-### 1단계: 잔재 점검
+### 가장 쉬운 방법: 마이그레이션 스크립트 (권장)
+
+repo 의 `scripts/migrate.*` 가 잔재 정리 + 플러그인 설치를 한 번에 처리한다. (settings.json 은 변경 전 자동 백업, 4brain 공용 hook 은 보존)
+
+- Windows: `powershell -ExecutionPolicy Bypass -File scripts\migrate.ps1`
+- macOS/Linux: `bash scripts/migrate.sh`
+
+스크립트를 못 받는 멤버는 아래 수동 절차를 따른다.
+
+### (수동) 1단계: 잔재 점검
 
 ```bash
 echo "=== 기존 install.ps1 잔재 점검 ==="
