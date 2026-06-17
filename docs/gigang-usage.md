@@ -32,6 +32,15 @@ Claude Code 에서:
 
 서드파티 마켓플레이스 플러그인은 기본적으로 자동 업데이트가 비활성일 수 있습니다. `/plugin` 명령으로 업데이트 정책을 확인하세요.
 
+### 기존 install.ps1 멤버 → 플러그인 전환
+
+예전 `install.ps1` 로 깐 멤버는 마이그레이션 스크립트로 잔재 정리 + 플러그인 설치를 한 번에 처리합니다 (settings.json 자동 백업, 4brain 공용 hook 보존):
+
+- Windows: `powershell -ExecutionPolicy Bypass -File scripts\migrate.ps1`
+- macOS/Linux: `bash scripts/migrate.sh`
+
+수동 절차는 `/gigang:help` 가 안내합니다.
+
 ## /gigang:init
 
 **용도**: 기강 멤버의 Claude Code 환경을 한 번에 셋업.
