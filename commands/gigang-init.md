@@ -64,7 +64,7 @@ claude plugin install superpowers@claude-plugins-official
 ```bash
 SETTINGS="$HOME/.claude/settings.json"
 if [ -f "$SETTINGS" ]; then
-  python3 -c "
+  uv run --no-project python -c "
 import json, sys
 with open('$SETTINGS') as f: d = json.load(f)
 d['model'] = 'claude-sonnet-4-6'
@@ -97,6 +97,7 @@ fi
 
 ```bash
 CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+mkdir -p "$HOME/.claude"
 if [ -f "$CLAUDE_MD" ] && grep -q "gstack" "$CLAUDE_MD"; then
   echo '[SKIP] CLAUDE.md  gstack 이미 있음'
 else
@@ -115,10 +116,8 @@ fi
 
 ```bash
 case "$(uname)" in
-  *)
-    # Windows only — D2Coding 폰트 설치 + Windows Terminal 적용
-    :
-    ;;
+  Darwin) echo '[SKIP] D2Coding/Terminal  macOS는 건너뜁니다 (Windows 전용)' ;;
+  *) ;;  # Windows: 아래 PowerShell 블록 진행
 esac
 ```
 
