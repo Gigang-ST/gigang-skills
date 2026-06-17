@@ -1,0 +1,8 @@
+{
+  "name": "gigang-skills",
+  "owner": { "name": "Gigang-ST" },
+  "plugins": [
+    { "name": "gigang", "source": "./",
+      "description": "기강 러닝크루용 AI 자동화 도구 모음" }
+  ]
+}
