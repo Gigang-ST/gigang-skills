@@ -9,8 +9,16 @@ model: claude-haiku-4-5
 
 ## Phase 0 — 작업 폴더 결정
 
-PowerShell 로 후보 폴더 검색:
+OS별로 후보 폴더를 탐색한다:
 
+**macOS**:
+```bash
+for d in ~/work ~/projects ~/dev; do
+  [ -d "$d" ] && echo "$d"
+done
+```
+
+**Windows**:
 ```powershell
 @('C:\Prog','C:\WORK','C:\Workspace','C:\Projects','C:\src','C:\dev','C:\code') |
     Where-Object { Test-Path $_ }
@@ -18,39 +26,32 @@ PowerShell 로 후보 폴더 검색:
 
 결과를 기반으로 AskUserQuestion 호출:
 
-- 발견된 폴더들 + `C:\Prog 새로 만들기` 옵션을 보기로 제시
+- macOS: 발견된 폴더들 + `~/work 새로 만들기` 옵션을 보기로 제시
+- Windows: 발견된 폴더들 + `C:\Prog 새로 만들기` 옵션을 보기로 제시
 - 첫 번째 (가장 그럴듯한 후보) 라벨 끝에 `(Recommended)` 표시
-- 발견 폴더 0개면 `C:\Prog 새로 만들기` 가 유일 옵션
+- 발견 폴더 0개면 OS별 기본값(macOS: `~/work`, Windows: `C:\Prog`) 새로 만들기가 유일 옵션
 
-선택된 경로 → 변수 `$WorkDir` 로 보관. 다음 Phase 로.
+선택된 경로 → 변수 `$WORKDIR` 로 보관. 다음 Phase 로.
 
-## Phase 1 — `init.ps1` 호출
+## Phase 1 — init 스크립트 호출
 
-repo 위치 검색:
+OS를 감지해 적합한 init 스크립트를 실행한다:
 
-```powershell
-$candidates = @(
-    "$env:USERPROFILE\.gigang-skills\scripts\init.ps1",
-    "C:\Prog\gigang-skills\scripts\init.ps1",
-    "C:\WORK\gigang-skills\scripts\init.ps1"
-)
-$initPath = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+```bash
+case "$(uname)" in
+  Darwin) bash "${CLAUDE_PLUGIN_ROOT}/scripts/init.sh" "$WORKDIR" ;;
+  *) pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/scripts/init.ps1" -WorkDir "$WORKDIR" ;;
+esac
 ```
 
-발견 못 하면 안내 후 중단:
-> init.ps1 못 찾음. gigang-skills repo 가 `$HOME\.gigang-skills` 또는 `C:\Prog\gigang-skills` 에 있는지 확인하세요.
-
-발견하면 호출:
-
-```powershell
-pwsh -NoProfile -File $initPath -WorkDir $WorkDir
-```
+스크립트를 찾지 못하면 안내 후 중단:
+> init 스크립트 못 찾음. gigang-skills repo 가 `$HOME/.gigang-skills` 또는 작업 폴더 아래에 있는지 확인하세요.
 
 stdout 의 `[OK]/[SKIP]/[FAIL]` 줄들을 캡처해서 Phase 3 요약에 사용.
 
 ## Phase 2 — Claude Code 플러그인 설치
 
-```powershell
+```bash
 claude plugin install superpowers@claude-plugins-official
 ```
 
@@ -60,15 +61,19 @@ claude plugin install superpowers@claude-plugins-official
 
 `~/.claude/settings.json` 의 `model` 필드를 `claude-sonnet-4-6` 으로 설정:
 
-```powershell
-$settingsPath = "$env:USERPROFILE\.claude\settings.json"
-$settings = if (Test-Path $settingsPath) {
-    Get-Content $settingsPath -Raw | ConvertFrom-Json
-} else {
-    [PSCustomObject]@{}
-}
-$settings | Add-Member -NotePropertyName "model" -NotePropertyValue "claude-sonnet-4-6" -Force
-$settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
+```bash
+SETTINGS="$HOME/.claude/settings.json"
+if [ -f "$SETTINGS" ]; then
+  python3 -c "
+import json, sys
+with open('$SETTINGS') as f: d = json.load(f)
+d['model'] = 'claude-sonnet-4-6'
+with open('$SETTINGS', 'w') as f: json.dump(d, f, indent=2)
+"
+else
+  mkdir -p "$HOME/.claude"
+  echo '{"model":"claude-sonnet-4-6"}' > "$SETTINGS"
+fi
 ```
 
 이미 `claude-sonnet-4-6` 이면 덮어써도 안전 (멱등).
@@ -77,44 +82,47 @@ $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
 
 gstack은 Claude Code에 웹 브라우저 자동화(`/browse`)와 개발 워크플로 스킬을 추가하는 오픈소스 도구 모음입니다.
 
-```powershell
-$gstackPath = "$env:USERPROFILE\.claude\skills\gstack"
-if (Test-Path $gstackPath) {
-    Write-Host '[SKIP] gstack   이미 설치됨'
-} else {
-    try {
-        git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git $gstackPath
-        Write-Host '[OK]   gstack   클론 완료'
-    } catch {
-        Write-Host "[FAIL] gstack   $_ — 무시하고 계속"
-    }
-}
+```bash
+GSTACK_PATH="$HOME/.claude/skills/gstack"
+if [ -d "$GSTACK_PATH" ]; then
+  echo '[SKIP] gstack   이미 설치됨'
+else
+  git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git "$GSTACK_PATH" \
+    && echo '[OK]   gstack   클론 완료' \
+    || echo '[FAIL] gstack   clone 실패 — 무시하고 계속'
+fi
 ```
 
 설치 후 `~/.claude/CLAUDE.md` 에 gstack 섹션 추가 (이미 있으면 skip):
 
-```powershell
-$claudeMd = "$env:USERPROFILE\.claude\CLAUDE.md"
-$content = if (Test-Path $claudeMd) { Get-Content $claudeMd -Raw } else { "" }
-if ($content -notmatch "gstack") {
-    $gstackSection = @"
-
-## gstack
-
-모든 웹 브라우징은 gstack 의 `/browse` 스킬 사용. `mcp__claude-in-chrome__*` 도구는 사용하지 않는다.
-"@
-    Add-Content $claudeMd $gstackSection -Encoding UTF8
-    Write-Host '[OK]   CLAUDE.md  gstack 섹션 추가'
-} else {
-    Write-Host '[SKIP] CLAUDE.md  gstack 이미 있음'
-}
+```bash
+CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+if [ -f "$CLAUDE_MD" ] && grep -q "gstack" "$CLAUDE_MD"; then
+  echo '[SKIP] CLAUDE.md  gstack 이미 있음'
+else
+  printf '\n## gstack\n\n모든 웹 브라우징은 gstack 의 `/browse` 스킬 사용. `mcp__claude-in-chrome__*` 도구는 사용하지 않는다.\n' >> "$CLAUDE_MD"
+  echo '[OK]   CLAUDE.md  gstack 섹션 추가'
+fi
 ```
 
 실패해도 다음 Phase 계속.
 
 ## Phase 2-d — Windows Terminal 글씨체 D2Coding 설정
 
-D2Coding 폰트 설치 + Windows Terminal 적용. 멱등.
+**macOS는 이 Phase를 건너뜁니다** (macOS용 터미널 폰트 설정은 iTerm2/Terminal.app 에서 수동으로 진행하세요).
+
+**Windows 전용**:
+
+```bash
+case "$(uname)" in
+  *)
+    # Windows only — D2Coding 폰트 설치 + Windows Terminal 적용
+    :
+    ;;
+esac
+```
+
+Windows에서 실행:
 
 ```powershell
 # 1. 폰트 설치 (이미 있으면 skip)
@@ -177,6 +185,24 @@ if (Test-Path $wtSettings) {
 
 각 Phase 의 결과를 표로:
 
+**macOS**:
+```
+[OK]   git           이미 설치
+[OK]   gh            설치 (v2.x.x)
+[OK]   uv            이미 설치
+[OK]   작업 폴더     ~/work (변경 없음)
+[OK]   cc alias      ~/.zshrc 에 추가
+[OK]   CLAUDE.md     uv 문구 추가
+[OK]   superpowers   플러그인 설치
+[OK]   디폴트 모델   claude-sonnet-4-6 설정
+[OK]   gstack        ~/.claude/skills/gstack 클론 + CLAUDE.md 섹션 추가
+
+다음:
+  1. 새 터미널 창 열기 (PATH 갱신)
+  2. cc 로 Claude Code 다시 시작
+```
+
+**Windows**:
 ```
 [OK]   git           이미 설치
 [OK]   gh            설치 (v2.x.x)
@@ -204,7 +230,7 @@ Phase 3 요약에서 `[FAIL]` 항목이 하나라도 있으면 자동으로 GitH
 
 먼저 gh 인증 여부 확인:
 
-```powershell
+```bash
 gh auth status 2>&1
 ```
 
@@ -212,9 +238,30 @@ gh auth status 2>&1
 > gh 인증이 필요합니다. `gh auth login` 실행 후 `/gigang-init` 을 다시 호출하면 자동으로 이슈가 등록됩니다.
 > 지금 바로 올리려면: https://github.com/Gigang-ST/gigang-skills/issues/new
 
-인증된 경우 → Windows 버전과 실패 항목 목록을 포함한 이슈 생성:
+인증된 경우 → OS 버전과 실패 항목 목록을 포함한 이슈 생성:
 
+**macOS**:
+```bash
+OS_VER="$(sw_vers -productName) $(sw_vers -productVersion)"
+FAIL_LINES="..." # Phase 3에서 캡처한 [FAIL] 줄들
+
+gh issue create \
+    --repo Gigang-ST/gigang-skills \
+    --title "[gigang-init] FAIL 항목 발생" \
+    --body "## 환경
+- OS: $OS_VER
+
+## 실패 항목
+$FAIL_LINES
+
+## 재현 방법
+/gigang-init 실행" \
+    --label "bug"
+```
+
+**Windows**:
 ```powershell
+# Windows 전용 — case "*)" 분기
 $winVer = (Get-CimInstance Win32_OperatingSystem).Caption
 $psVer  = $PSVersionTable.PSVersion.ToString()
 
@@ -248,6 +295,7 @@ gh issue create `
 
 ## 흔한 실수
 
-- winget 자체 미설치 (Windows 10 구버전) → https://aka.ms/getwinget 안내
-- Windows Terminal 한 번도 안 열어봄 → PowerShell 7 프로파일 미등록. Terminal 한 번 열고 init 다시 돌리기
-- `cc` alias 가 새 셸에서만 보임 → 첫 실행 끝나고 새 PowerShell 창 열어야 사용 가능
+- **macOS**: brew 미설치 → https://brew.sh 안내
+- **Windows**: winget 자체 미설치 (Windows 10 구버전) → https://aka.ms/getwinget 안내
+- **Windows**: Windows Terminal 한 번도 안 열어봄 → PowerShell 7 프로파일 미등록. Terminal 한 번 열고 init 다시 돌리기
+- `cc` alias 가 새 셸에서만 보임 → 첫 실행 끝나고 새 터미널 창 열어야 사용 가능
