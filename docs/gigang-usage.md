@@ -21,6 +21,47 @@
 | "폴더 구조 잡아줘", "폴더 정리해줘" | `gigang:folder-guide` |
 | "버그 보고해줘", "이슈 올려줘" | `gigang:report` |
 
+## 신규 멤버 첫 셋업 — 단계별 절차
+
+### 1단계: Claude Code 설치
+
+PowerShell을 열고 (`Win + R` → `powershell`):
+
+```powershell
+winget install Anthropic.ClaudeCode
+```
+
+설치 후 PowerShell 창 닫고 새로 열기. 확인:
+
+```powershell
+claude --version
+```
+
+### 2단계: 기강 플러그인 설치
+
+```
+claude --dangerously-skip-permissions
+```
+
+Claude Code가 실행되면:
+
+```
+/plugin marketplace add Gigang-ST/gigang-skills
+/plugin install gigang@gigang-skills
+```
+
+### 3단계: 환경 초기 셋업
+
+```
+/gigang:init
+```
+
+git, gh, uv 설치부터 cc 단축어, Claude Code 플러그인(superpowers)까지 한 번에 처리.
+
+### 4단계: 새 터미널 열기
+
+`/gigang:init` 완료 후 터미널 창을 닫고 새로 열기 (PATH 갱신). 이후엔 `cc` 로 Claude Code 시작.
+
 ## 설치 / 업데이트
 
 Claude Code 에서:
