@@ -3,16 +3,13 @@
   "hooks": {
     "UserPromptSubmit": [
       { "hooks": [
-        { "type": "command", "command": "uv run --no-project python",
-          "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/log_prompt.py"], "timeout": 10 },
-        { "type": "command", "command": "uv run --no-project python",
-          "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/opus_suggest.py"], "timeout": 3 }
+        { "type": "command", "command": "uv run --no-project python \"${CLAUDE_PLUGIN_ROOT}/hooks/log_prompt.py\"", "timeout": 10 },
+        { "type": "command", "command": "uv run --no-project python \"${CLAUDE_PLUGIN_ROOT}/hooks/opus_suggest.py\"", "timeout": 10 }
       ]}
     ],
     "Stop": [
       { "hooks": [
-        { "type": "command", "command": "uv run --no-project python",
-          "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/log_response.py"], "timeout": 15 }
+        { "type": "command", "command": "uv run --no-project python \"${CLAUDE_PLUGIN_ROOT}/hooks/log_response.py\"", "timeout": 15 }
       ]}
     ]
   }

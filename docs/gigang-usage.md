@@ -20,6 +20,7 @@
 | "어제 뭐했더라", "지난주 작업 정리해줘" | `gigang:recall` |
 | "폴더 구조 잡아줘", "폴더 정리해줘" | `gigang:folder-guide` |
 | "버그 보고해줘", "이슈 올려줘" | `gigang:report` |
+| "인라인 스테이터스 셋업", "상태줄 무지개로 켜줘" | `gigang:set-inline-status` |
 
 ## 신규 멤버 첫 셋업 — 단계별 절차
 
@@ -178,6 +179,24 @@ Issue 제출처: https://github.com/Gigang-ST/gigang-skills/issues
 **발동 표현**:
 - "신규 멤버 환경 셋업해줘", "기강 깔아줘" → `/gigang:init`
 - "기강 뭐 있어", "기강 도움말" → 명령 목록 출력
+
+## set-inline-status (자연어 스킬)
+
+**용도**: Claude Code 하단 상태표시줄(statusline)을 gigang 표준 멀티라인 디자인으로 설치·연결.
+
+**발동 표현**: "인라인 스테이터스 셋업해줘", "상태줄 무지개로 켜줘", "statusline gigang 표준으로 깔아줘"
+
+**표시 내용** (3줄):
+1. `user@host:경로 [모델] 🌿브랜치 +스테이지 ~수정`
+2. 무지개 컨텍스트 사용량 바 + `%` + `(사용/전체 토큰)` + `$비용` + `⏱경과시간`
+3. `5h` / `7d` rate-limit 무지개 바 (Claude.ai Pro/Max + 첫 API 응답 후에만)
+
+**동작**:
+1. 정본 `skills/set-inline-status/statusline.sh` 를 `~/.claude/gigang-statusline.sh` 로 복사
+2. `settings.json` 의 `statusLine` 필드만 교체(다른 키 보존, `.bak` 백업)
+3. mock 입력으로 검증
+
+> **조건**: `jq` 설치(`winget install jqlang.jq`) + TrueColor(24bit) 터미널(Windows Terminal·VS Code 등). command 경로는 forward slash + `~` 사용(Windows Git Bash 백슬래시 escape 회피). 끄려면 `settings.json` 의 `statusLine` 삭제.
 
 ---
 

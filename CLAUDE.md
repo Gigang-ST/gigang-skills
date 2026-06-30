@@ -32,5 +32,7 @@ Python이 필요하면 항상 `uv run --no-project python` 사용. 절대 bare `
 훅은 `hooks/hooks.json` 에 선언한다. 플러그인 시스템이 `${CLAUDE_PLUGIN_ROOT}` 를 기준으로 경로를 해석해 자동 등록한다.
 
 - 훅 실행 파일: `hooks/*.py`
+- **`args` 없이 `command` 하나에 전체 셸 문자열을 넣는다(shell form)**: `uv run --no-project python "${CLAUDE_PLUGIN_ROOT}/hooks/log_prompt.py"` (스크립트 경로는 공백 대비 큰따옴표로 감쌀 것). `args` 를 함께 넣으면 exec form 으로 바뀌어 `command` 가 단일 실행 파일 이름으로 해석된다 — `command: "uv run --no-project python"` + `args: [...]` 처럼 쓰면 "uv run --no-project python" 을 통째로 실행 파일로 찾다가 실패하고, 결과적으로 스크립트 경로 없이 `uv run --no-project python` 만 돌아 stdin 의 이벤트 JSON 을 소스로 해석한다(Stop 페이로드의 `false` → `NameError`). 관련 이슈 #5.
 - 경로 참조 예시: `"${CLAUDE_PLUGIN_ROOT}/hooks/log_prompt.py"`
 - `hooks.json` 포맷은 기존 선언을 참고. 새 훅 추가 시 이미 있는 이벤트 키(`UserPromptSubmit`, `Stop` 등)에 항목을 append하고 idempotent하게 작성.
+- `uv` 최초 Python 다운로드 시 간헐적 타임아웃을 피하려 timeout 은 최소 10초.
